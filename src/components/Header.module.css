@@ -1,0 +1,10 @@
+.myNavLink {
+    color: grey;
+    margin: 1rem;
+    transition: color 600ms;
+    text-decoration: none;
+}
+
+.myNavLink:hover {
+    color: rgb(69, 69, 69);
+}

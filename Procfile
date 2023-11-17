@@ -1,1 +1,1 @@
-web: node dist/index.html
+web: serve -s dist

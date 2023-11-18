@@ -1,0 +1,41 @@
+.authCard {
+  color: var(--main-text-color);
+}
+
+.authInput {
+  background: #ffffff;
+  border: 1px solid #f0f1f9;
+  box-sizing: border-box;
+  border-radius: 2px;
+  color: #7177a1;
+  text-align: center;
+  padding: 10px;
+}
+
+.authHeader {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.4rem;
+  text-align: center;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+}
+
+.authLink {
+  text-decoration: none;
+  padding-left: .5rem;
+}
+
+.authLink span {
+  display: inline-block;
+  color: var(--secondary-color);
+}
+
+.SignInCol {
+  height: 320px;
+}
+
+.SignUpCol {
+  height: 375px;
+}

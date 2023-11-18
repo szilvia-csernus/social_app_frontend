@@ -1,10 +1,10 @@
 .myNavLink {
-    color: grey;
-    margin: 1rem;
-    transition: color 600ms;
+    color: var(--bs-gray);
+    margin: .7rem;
+    transition: opacity 0.4s;
     text-decoration: none;
 }
 
 .myNavLink:hover {
-    color: rgb(69, 69, 69);
+    opacity: .7;
 }

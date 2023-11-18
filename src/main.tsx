@@ -8,21 +8,20 @@ import {
 	RouterProvider,
 } from 'react-router-dom';
 import ErrorPage from './routes/Error.tsx';
+import SignUpForm from './auth/SignUpForm.tsx';
 
 
 const router = createBrowserRouter([
-		{
-			path: '/',
-			element: (
-				<Root />
-			),
-			errorElement: <ErrorPage/>,
-			children: [
-				{ path: 'sign-in', element: <h1>Sign In</h1> },
-				{ path: 'register', element: <h1>Register</h1> },
-			],
-		},
-  ])
+	{
+		path: '/',
+		element: <Root />,
+		errorElement: <ErrorPage />,
+		children: [
+			{ path: 'sign-in', element: <SignUpForm /> },
+			{ path: 'register', element: <SignUpForm /> },
+		],
+	},
+]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

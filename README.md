@@ -33,4 +33,9 @@ If you are developing a production application, we recommend updating the config
 
 # Credits
 
-Logo: https://www.reshot.com/free-svg-icons/item/link-6C7WZ3JNQR/
+Logo: https://fontawesome.com/icons/people-line?f=classic&s=solid
+Background color: https://cssgradient.io/swatches/
+Illustrations: https://undraw.co/
+
+Converting svg to png for favicon: https://svgtopng.com/
+Favicon generator: https://realfavicongenerator.net/

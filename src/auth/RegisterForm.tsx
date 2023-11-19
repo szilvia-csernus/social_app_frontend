@@ -80,15 +80,7 @@ const RegisterForm = () => {
 	};
 
 	return (
-		<Row className="py-5">
-			<Col md={6} className="my-auto d-none d-md-block p-2">
-				<img
-					src={illustration}
-					width="300"
-					height="300"
-					alt="register illustration"
-				/>
-			</Col>
+		<Row className="py-5 gx-5">
 			<Col className="my-auto py-2 px-0" md={6}>
 				<Card className={`p-4 ${classes.authCard}`}>
 					<Card.Body>
@@ -170,12 +162,20 @@ const RegisterForm = () => {
 						</Form>
 						<div>
 							Already have an account?
-							<Link className={classes.authLink} to="/signin">
-								<span>Sign in</span>
+							<Link className={classes.authLink} to="/login">
+								<span>Log in</span>
 							</Link>
 						</div>
 					</Card.Body>
 				</Card>
+			</Col>
+			<Col md={6} className="my-auto mx-auto d-none d-md-block">
+				<img
+					src={illustration}
+					width="300"
+					height="300"
+					alt="register illustration"
+				/>
 			</Col>
 		</Row>
 	);

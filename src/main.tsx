@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import ErrorPage from './routes/Error.tsx';
 import RegisterForm from './auth/RegisterForm.tsx';
+import LogInForm from './auth/LogInForm.tsx';
 
 
 const router = createBrowserRouter([
@@ -17,8 +18,9 @@ const router = createBrowserRouter([
 		element: <Root />,
 		errorElement: <ErrorPage />,
 		children: [
-			{ path: 'sign-in', element: '' },
+			{ path: 'login', element: <LogInForm /> },
 			{ path: 'register', element: <RegisterForm /> },
+			{ path: 'posts', element: 'Posts' },
 		],
 	},
 ]);

@@ -26,8 +26,8 @@ function Header() {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
 					<Nav>
-						<Link to="/sign-in" className={classes.myNavLink}>
-							<i className="fa-solid fa-right-to-bracket"></i> Sign in
+						<Link to="/login" className={classes.myNavLink}>
+							<i className="fa-solid fa-right-to-bracket"></i> Log in
 						</Link>
 						<Link to="/register" className={classes.myNavLink}>
 							<i className="fa-solid fa-circle-user"></i> Register

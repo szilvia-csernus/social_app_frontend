@@ -33,7 +33,7 @@ type ErrorResponse = {
 };
 
 
-const SignUpForm = () => {
+const RegisterForm = () => {
 	const [registerData, setRegisterData] = useState<registerDataType>({
 		username: '',
 		password1: '',
@@ -181,4 +181,4 @@ const SignUpForm = () => {
 	);
 }
 
-export default SignUpForm;
+export default RegisterForm;

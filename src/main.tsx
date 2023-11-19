@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Root from './routes/Root.tsx'
+import App from './routes/App.tsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css'
 import {
@@ -15,7 +15,7 @@ import LogInForm from './auth/LogInForm.tsx';
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <Root />,
+		element: <App />,
 		errorElement: <ErrorPage />,
 		children: [
 			{ path: 'login', element: <LogInForm /> },

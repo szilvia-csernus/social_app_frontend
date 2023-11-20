@@ -10,6 +10,7 @@ import {
 import ErrorPage from './routes/Error.tsx';
 import RegisterForm from './auth/RegisterForm.tsx';
 import LogInForm from './auth/LogInForm.tsx';
+import { CurrentUserProvider } from './contexts/CurrentUserContext';
 
 
 const router = createBrowserRouter([
@@ -26,7 +27,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
-)
+	<React.StrictMode>
+		<CurrentUserProvider>
+			<RouterProvider router={router} />
+		</CurrentUserProvider>
+	</React.StrictMode>
+);

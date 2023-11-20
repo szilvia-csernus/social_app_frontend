@@ -9,7 +9,7 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetCurrentUserContext } from '../routes/App';
+import { SetCurrentUserContext } from '../contexts/CurrentUserContext';
 
 type logInDataType = {
 	username: string,

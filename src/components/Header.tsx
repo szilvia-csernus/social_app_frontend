@@ -7,7 +7,7 @@ import Navbar from 'react-bootstrap/Navbar';
 
 import classes from './Header.module.css';
 import { ReactNode, useContext } from 'react';
-import { CurrentUserContext, type UserContextType } from '../routes/App';
+import { CurrentUserContext, type UserContextType } from '../contexts/CurrentUserContext';
 
 
 function Header() {

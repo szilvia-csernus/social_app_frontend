@@ -6,8 +6,26 @@ import Navbar from 'react-bootstrap/Navbar';
 // import myLogo from '../assets/logo.svg';
 
 import classes from './Header.module.css';
+import { ReactNode, useContext } from 'react';
+import { CurrentUserContext, type UserContextType } from '../routes/App';
+
 
 function Header() {
+	const currentUser: UserContextType = useContext(CurrentUserContext);
+	const loggedInIcons: ReactNode = 
+		<>
+		{currentUser ? currentUser.username : null}
+		</>
+	const loggedOutIcons = (
+		<>
+			<Link to="/login" className={classes.myNavLink}>
+				<i className="fa-solid fa-right-to-bracket"></i> Log in
+			</Link>
+			<Link to="/register" className={classes.myNavLink}>
+				<i className="fa-solid fa-circle-user"></i> Register
+			</Link>
+		</>
+	);
 	return (
 		<Navbar expand="md" className="bg-body-tertiary">
 			<Container>
@@ -26,12 +44,7 @@ function Header() {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
 					<Nav>
-						<Link to="/login" className={classes.myNavLink}>
-							<i className="fa-solid fa-right-to-bracket"></i> Log in
-						</Link>
-						<Link to="/register" className={classes.myNavLink}>
-							<i className="fa-solid fa-circle-user"></i> Register
-						</Link>
+						{currentUser ? loggedInIcons : loggedOutIcons}
 					</Nav>
 				</Navbar.Collapse>
 			</Container>

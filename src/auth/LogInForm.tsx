@@ -5,10 +5,11 @@ import { Col, Row, Form, Button, Alert } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import illustration from '../assets/login.svg';
 
-import { type ChangeEvent, useState, FormEvent } from 'react';
+import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { SetCurrentUserContext } from '../routes/App';
 
 type logInDataType = {
 	username: string,
@@ -32,6 +33,8 @@ type ErrorResponse = {
 };
 
 const LogInForm = () => {
+	const setCurrentUser = useContext(SetCurrentUserContext);
+
 	const [logInData, setLogInData] = useState<logInDataType>({
 		username: '',
 		password: ''
@@ -57,7 +60,8 @@ const LogInForm = () => {
 		event.preventDefault();
 
 		try {
-			await axios.post('dj-rest-auth/login/', logInData);
+			const {data} = await axios.post('dj-rest-auth/login/', logInData);
+			setCurrentUser(data.user)
 			navigate('/posts/');
 		} catch (error) {
 			console.log(error);
@@ -135,7 +139,7 @@ const LogInForm = () => {
 								className={`${btnClasses.button} ${btnClasses.wide}`}
 								type="submit"
 							>
-								Register
+								Log In
 							</Button>
 							{errors &&
 								errors.non_field_errors.map((data, idx) => (

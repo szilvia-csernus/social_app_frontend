@@ -7,7 +7,7 @@ import illustration from '../assets/register.svg';
 
 import { type ChangeEvent, useState, FormEvent } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 type registerDataType = {
@@ -44,7 +44,7 @@ const RegisterForm = () => {
 
 	const {username, password1, password2 } = registerData;
 
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const {name, value} = event.target;
@@ -61,7 +61,7 @@ const RegisterForm = () => {
 
 		try {
 			await axios.post('dj-rest-auth/registration/', registerData);
-			navigate('dj-rest-auth/login/');
+			// navigate('login');
 		} catch (error) {
 			console.log(error)
 			if (axios.isAxiosError(error)) {

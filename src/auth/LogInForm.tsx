@@ -9,7 +9,7 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetCurrentUserContext } from '../contexts/CurrentUserContext';
+import { SetAccessKeyContext } from '../contexts/CurrentUserContext';
 
 type logInDataType = {
 	username: string,
@@ -33,7 +33,7 @@ type ErrorResponse = {
 };
 
 const LogInForm = () => {
-	const setCurrentUser = useContext(SetCurrentUserContext);
+	const setAccessKey = useContext(SetAccessKeyContext);
 
 	const [logInData, setLogInData] = useState<logInDataType>({
 		username: '',
@@ -60,9 +60,12 @@ const LogInForm = () => {
 		event.preventDefault();
 
 		try {
-			const {data} = await axios.post('dj-rest-auth/login/', logInData);
-			setCurrentUser(data.user)
-			navigate('/posts/');
+			const {data} = await axios.post('api/token/', logInData);
+			setAccessKey(data.access);
+			localStorage.setItem("access", data.access);
+			localStorage.setItem("refresh", data.refresh);
+			console.log("tokens set in localstorage", data)
+			navigate('/posts');
 		} catch (error) {
 			console.log(error);
 			if (axios.isAxiosError(error)) {

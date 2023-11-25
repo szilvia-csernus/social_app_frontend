@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './routes/App.tsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,11 +27,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<React.StrictMode>
-		<ErrorBoundary>
-			<CurrentUserProvider>
-				<RouterProvider router={router} />
-			</CurrentUserProvider>
-		</ErrorBoundary>
-	</React.StrictMode>
+	<ErrorBoundary>
+		<CurrentUserProvider>
+			<RouterProvider router={router} />
+		</CurrentUserProvider>
+	</ErrorBoundary>
 );

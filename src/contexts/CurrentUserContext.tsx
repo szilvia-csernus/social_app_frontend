@@ -33,10 +33,12 @@ const storedAccessKey = localStorage.getItem('access');
 const refreshKey = localStorage.getItem('refresh');
 
 export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
+	console.log('CurrentUserProvider runs')
 	const [currentUser, setCurrentUser] = useState(null);
 	const [accessKey, setAccessKey] = useState('');
 
 	const fetchCurrentUser = useCallback(async () => {
+		console.log('fetchCurrentUser runs')
 		if (storedAccessKey) {
 			setAccessKey(storedAccessKey);
 		}
@@ -52,6 +54,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 				console.log('removing tokens');
 				localStorage.removeItem('access');
 				localStorage.removeItem('refresh');
+				setAccessKey('');
 				console.log(err);
 			}
 		};
@@ -79,6 +82,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 			
 
 	useEffect(() => {
+		console.log('useEffect runs')
 		fetchCurrentUser();
 	},[fetchCurrentUser]);
 

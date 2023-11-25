@@ -60,12 +60,15 @@ const LogInForm = () => {
 		event.preventDefault();
 
 		try {
-			const {data} = await axios.post('api/token/', logInData);
-			setAccessKey(data.access);
-			localStorage.setItem("access", data.access);
-			localStorage.setItem("refresh", data.refresh);
-			console.log("tokens set in localstorage", data)
-			navigate('/posts');
+			const loginData = await axios.post('dj-rest-auth/login/', logInData)
+			if (loginData.status === 200) {
+				const {data} = await axios.post('api/token/', logInData);
+				setAccessKey(data.access);
+				localStorage.setItem("access", data.access);
+				localStorage.setItem("refresh", data.refresh);
+				console.log("tokens set in localstorage", data)
+				navigate('/posts');
+			}
 		} catch (error) {
 			console.log(error);
 			if (axios.isAxiosError(error)) {

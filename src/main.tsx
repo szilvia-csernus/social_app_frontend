@@ -21,7 +21,10 @@ const router = createBrowserRouter([
 		children: [
 			{ path: 'login', element: <LogInForm /> },
 			{ path: 'register', element: <RegisterForm /> },
-			{ path: 'posts', element: 'Posts' },
+			{ path: 'posts/create', element: 'Create Post' },
+			{ path: 'liked', element: 'Liked elements' },
+			{ path: 'feed', element: 'Feed' },
+			{ path: 'profiles', element: 'Profiles page' },
 		],
 	},
 ]);

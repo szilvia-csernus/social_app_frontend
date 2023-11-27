@@ -77,3 +77,7 @@ figure {
   vertical-align: middle;
 }
 
+.active {
+  color: var(--primary-color);
+}
+

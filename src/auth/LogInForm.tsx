@@ -69,7 +69,7 @@ const LogInForm = () => {
 				localStorage.setItem("access", data.access);
 				localStorage.setItem("refresh", data.refresh);
 				console.log("tokens set in localstorage", data)
-				navigate('/posts');
+				navigate('/feed');
 			}
 		} catch (error) {
 			console.log(error);

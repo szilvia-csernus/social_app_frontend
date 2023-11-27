@@ -10,7 +10,7 @@ import ErrorPage from './routes/Error.tsx';
 import RegisterForm from './auth/RegisterForm.tsx';
 import LogInForm from './auth/LogInForm.tsx';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
-import ErrorBoundary from './ErrorBoundary.tsx';
+import React from 'react';
 
 
 const router = createBrowserRouter([
@@ -27,9 +27,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<ErrorBoundary>
+	<React.StrictMode>
 		<CurrentUserProvider>
 			<RouterProvider router={router} />
 		</CurrentUserProvider>
-	</ErrorBoundary>
+	</React.StrictMode>
 );

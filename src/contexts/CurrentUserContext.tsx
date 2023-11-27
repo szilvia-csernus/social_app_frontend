@@ -21,29 +21,27 @@ export type UserContextType = {
 } | null;
 
 export const CurrentUserContext = createContext<UserContextType>(null);
-
 export const SetAccessKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
+export const SetRefreshKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
 
 
 type CurrentUserProviderProps = {
 	children: ReactNode;
 };
 
-const storedAccessKey = localStorage.getItem('access');
-const refreshKey = localStorage.getItem('refresh');
+const storedAccessKey = localStorage.getItem('access') || '';
+const storedRrefreshKey = localStorage.getItem('refresh') || '';
 
 export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 	console.log('CurrentUserProvider runs')
 	const [currentUser, setCurrentUser] = useState(null);
-	const [accessKey, setAccessKey] = useState('');
+	const [accessKey, setAccessKey] = useState(storedAccessKey);
+	const [refreshKey, setRefreshKey] = useState(storedRrefreshKey);
 
 	const fetchCurrentUser = useCallback(async () => {
 		console.log('fetchCurrentUser runs')
-		if (storedAccessKey) {
-			setAccessKey(storedAccessKey);
-		}
 		
-		if (accessKey !== '' &&  accessKey !== null) {
+		if (accessKey !== '') {
 			try {
 				const { data } = await axiosRes.get('dj-rest-auth/user', {
 					headers: {
@@ -58,6 +56,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 				// }
 			} catch (err) {
 				console.log('fetchCurrentUser error', err);
+				return null
 			}
 		// } else if (refreshKey) {
 		// 	console.log('fetchCurrentUser no accessKey but refreshKey');
@@ -123,7 +122,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 						});
 						setAccessKey(data.access);
 						localStorage.setItem('access', data.access);
-						console.log('access data set for localstorage', data);
+						console.log('access data set during interception', data);
 					} catch (err) {
 						setCurrentUser(null);
 					}
@@ -134,13 +133,15 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 				return Promise.reject(err)
 			}
 		)
-	}, [])
+	}, [refreshKey])
 
     return (
 			<ErrorBoundary>
 				<CurrentUserContext.Provider value={currentUser}>
 					<SetAccessKeyContext.Provider value={setAccessKey}>
-						{children}
+						<SetRefreshKeyContext.Provider value={setRefreshKey}>
+							{children}
+						</SetRefreshKeyContext.Provider>
 					</SetAccessKeyContext.Provider>
 				</CurrentUserContext.Provider>
 			</ErrorBoundary>

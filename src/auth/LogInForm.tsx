@@ -9,7 +9,7 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetAccessKeyContext } from '../contexts/CurrentUserContext';
+import { SetAccessKeyContext, SetRefreshKeyContext } from '../contexts/CurrentUserContext';
 
 type logInDataType = {
 	username: string,
@@ -34,6 +34,7 @@ type ErrorResponse = {
 
 const LogInForm = () => {
 	const setAccessKey = useContext(SetAccessKeyContext);
+	const setRefreshKey = useContext(SetRefreshKeyContext);
 
 	const [logInData, setLogInData] = useState<logInDataType>({
 		username: '',
@@ -64,6 +65,7 @@ const LogInForm = () => {
 			if (loginData.status === 200) {
 				const {data} = await axios.post('api/token/', logInData);
 				setAccessKey(data.access);
+				setRefreshKey(data.refresh);
 				localStorage.setItem("access", data.access);
 				localStorage.setItem("refresh", data.refresh);
 				console.log("tokens set in localstorage", data)

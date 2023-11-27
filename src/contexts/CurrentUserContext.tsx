@@ -18,6 +18,8 @@ export type UserContextType = {
 	email: string;
 	first_name: string;
 	last_name: string;
+	profile_id: number;
+	profile_image: string;
 } | null;
 
 export const CurrentUserContext = createContext<UserContextType>(null);
@@ -49,19 +51,16 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 					},
 				});
 				setCurrentUser(data);
-				console.log('fetchCurrentUser data', data);
-				// if (data.status === 401) {
-				// 	console.log('fetchCurrentUser refreshing token', data);
-				// 	refreshAccessToken();
-				// }
+				console.log('fetchCurrentUser function, setCurrentUser:', data);
+				
 			} catch (err) {
-				console.log('fetchCurrentUser error', err);
-				return null
+				console.log('fetchCurrentUser function, Access Key invalid, error:', err);
+				setCurrentUser(null)
+				console.log('currentUser set to null!')
 			}
-		// } else if (refreshKey) {
-		// 	console.log('fetchCurrentUser no accessKey but refreshKey');
-		// 	refreshAccessToken();
-		} else return null;
+		} else {
+			setCurrentUser(null)
+		}
 	}, [accessKey]);
 			
 
@@ -75,23 +74,6 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 
 	useMemo(() => {
 		console.log('useMemo runs')
-
-		// const refreshAccessToken = async () => {
-		// 	try {
-		// 		const { data } = await axios.post('api/token/refresh/', {
-		// 			refresh: refreshKey,
-		// 		});
-		// 		setAccessKey(data.access);
-		// 		localStorage.setItem('access', data.access);
-		// 		console.log('access data set for localstorage', data);
-		// 	} catch (err) {
-		// 		console.log('removing tokens');
-		// 		localStorage.removeItem('access');
-		// 		localStorage.removeItem('refresh');
-		// 		setAccessKey('');
-		// 		console.log(err);
-		// 	}
-		// };
 
 		axiosReq.interceptors.request.use(
 			async (config) => {

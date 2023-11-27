@@ -39,7 +39,7 @@ function Header() {
 	const loggedInIcons: ReactNode = (
 		<>
 			<NavLink to="/posts/create" className={classes.myNavLink}>
-				<i className="far fa-plus-square"></i> Add New Post
+				<i className="far fa-plus-square"></i> Post
 			</NavLink>
 			<NavLink to="/feed" className={classes.myNavLink}>
 				<i className="fas fa-stream"></i> Feed
@@ -48,26 +48,26 @@ function Header() {
 				<i className="fas fa-heart"></i> Liked
 			</NavLink>
 			<Link to="/" className={classes.myNavLink} onClick={HandleSignOut}>
-				<i className="fas fa-sign-out-alt"></i> Sign Out
+				<i className="fas fa-sign-out-alt"></i> Logout
 			</Link>
 			<NavLink
 				to={`/profiles/${currentUser?.profile_id}`}
 				className={classes.myNavLink}
 			>
 				{currentUser && (
-					<Avatar src={currentUser.profile_image} text="Profile" height={40} />
+					<Avatar src={currentUser.profile_image} text="" height={40} />
 				)}
 			</NavLink>
 		</>
 	);
 	const loggedOutIcons = (
 		<>
-			<Link to="/login" className={classes.myNavLink}>
+			<NavLink to="/login" className={classes.myNavLink}>
 				<i className="fa-solid fa-right-to-bracket"></i> Log in
-			</Link>
-			<Link to="/register" className={classes.myNavLink}>
+			</NavLink>
+			<NavLink to="/register" className={classes.myNavLink}>
 				<i className="fa-solid fa-circle-user"></i> Register
-			</Link>
+			</NavLink>
 		</>
 	);
 	return (

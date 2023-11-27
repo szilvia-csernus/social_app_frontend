@@ -80,7 +80,7 @@ const RegisterForm = () => {
 	};
 
 	return (
-		<Row className="py-5 gx-5">
+		<Row className="py-5">
 			<Col className="my-auto py-2 px-0" md={6}>
 				<Card className={`p-4 ${classes.authCard}`}>
 					<Card.Body>

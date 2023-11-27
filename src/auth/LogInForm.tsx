@@ -97,7 +97,7 @@ const LogInForm = () => {
 					alt="register illustration"
 				/>
 			</Col>
-			<Col className="my-auto py-2 px-0" md={6}>
+			<Col className="my-auto px-0" md={6}>
 				<Card className={`p-4 ${classes.authCard}`}>
 					<Card.Body>
 						<div>

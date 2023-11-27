@@ -33,7 +33,7 @@ If you are developing a production application, we recommend updating the config
 
 # Credits
 
-Logo: https://fontawesome.com/icons/people-line?f=classic&s=solid
+Logo: https://www.svgrepo.com/svg/489904/connect
 Background color: https://cssgradient.io/swatches/
 Illustrations: https://undraw.co/
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-// import myLogo from '../assets/logo.svg';
+import myLogo from '../assets/logo.svg';
 
 import classes from './Header.module.css';
 import { ReactNode, useContext } from 'react';
@@ -30,22 +30,19 @@ function Header() {
 		<Navbar expand="md" className="bg-body-tertiary">
 			<Container>
 				<Navbar.Brand>
-					{/* <img
-						src={myLogo}
-						width="60"
-						height="60"
-						className="d-inline-block align-top"
-						alt="connect logo"
-					/> */}
 					<Link to="/" className={classes.myNavLink}>
-						<i id="logo" className="fa-solid fa-people-line"></i>
+						<img
+							src={myLogo}
+							width="60"
+							height="60"
+							className="d-inline-block align-top"
+							alt="connect logo"
+						/>
 					</Link>
 				</Navbar.Brand>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-					<Nav>
-						{currentUser ? loggedInIcons : loggedOutIcons}
-					</Nav>
+					<Nav>{currentUser ? loggedInIcons : loggedOutIcons}</Nav>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

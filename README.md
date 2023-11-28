@@ -34,6 +34,7 @@ If you are developing a production application, we recommend updating the config
 # Credits
 
 Logo: https://www.svgrepo.com/svg/489904/connect
+Upload icon: https://www.svgrepo.com/svg/530396/upload
 Background color: https://cssgradient.io/swatches/
 Illustrations: https://undraw.co/
 

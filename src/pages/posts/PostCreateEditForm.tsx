@@ -12,9 +12,10 @@ import classes from './PostCreateEditForm.module.css';
 // import appStyles from '../../App.module.css';
 import btnClasses from '../../components/Button.module.css';
 import Asset from '../../components/Asset';
-import { Image } from 'react-bootstrap';
+import { Alert, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { axiosReq } from '../../api/axiosDefaults';
+import { type AxiosResponse } from 'axios';
 
 type PostData = {
 	title: string;
@@ -29,8 +30,28 @@ interface AxiosError extends Error {
 	};
 }
 
+type errorDetail = string[];
+
+type errorDataType =
+	| {
+		title: errorDetail;
+		content: errorDetail;
+		image: errorDetail;
+	}
+	| undefined;
+
+type PostError = {
+	title?: string[] | undefined;
+	content?: string[] | undefined;
+	image?: string[] | undefined;
+};
+
+interface PostErrorResponse extends AxiosResponse {
+	data: PostError | undefined;
+}
+
 function PostCreateForm() {
-	const [errors, setErrors] = useState({});
+	const [errors, setErrors] = useState<errorDataType>();
 	const [postData, setPostData] = useState<PostData>({
 		title: '',
 		content: '',
@@ -82,8 +103,14 @@ function PostCreateForm() {
 			navigate(`/posts/${data.id}`, { state: { from: location } });
 		} catch (err) {
 			const axiosError = err as AxiosError;
-			if (axiosError.response && axiosError.response.status !== 401) {
-				setErrors(axiosError.response.data || {});
+			console.log('axios error', axiosError)
+			if (axiosError.response && axiosError.response.data) {
+				const { data } = axiosError.response as PostErrorResponse;
+				setErrors({
+					title: data?.title || [],
+					content: data?.content || [],
+					image: data?.image || [],
+				});
 			}
 		}
 	}
@@ -105,6 +132,12 @@ function PostCreateForm() {
 					onChange={handleChange}
 				/>
 			</Form.Group>
+			{errors &&
+				errors.title.map((data, idx) => (
+					<Alert variant="warning" key={idx}>
+						{data}
+					</Alert>
+				))}
 			<Form.Group className="">
 				<Form.Label className="">Content</Form.Label>
 				<Form.Control
@@ -116,6 +149,12 @@ function PostCreateForm() {
 					onChange={handleChange}
 				/>
 			</Form.Group>
+			{errors &&
+				errors.content.map((data, idx) => (
+					<Alert variant="warning" key={idx}>
+						{data}
+					</Alert>
+				))}
 			<Button className={`${btnClasses.button}`} onClick={handleCancel}>
 				cancel
 			</Button>
@@ -136,11 +175,7 @@ function PostCreateForm() {
 							{image ? (
 								<>
 									<figure>
-										<Image
-											className={classes.image}
-											src={image}
-											rounded
-										/>
+										<Image className={classes.image} src={image} rounded />
 									</figure>
 									<div>
 										<Form.Label
@@ -170,6 +205,12 @@ function PostCreateForm() {
 								onChange={handleChangeImage}
 								ref={imageInput}
 							/>
+							{errors &&
+								errors.image.map((data, idx) => (
+									<Alert variant="warning" key={idx}>
+										{data}
+									</Alert>
+								))}
 						</Form.Group>
 						<div className="d-md-none">{textFields}</div>
 					</Container>

@@ -106,7 +106,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 						localStorage.setItem('access', data.access);
 						console.log('access data set during interception', data);
 					} catch (err) {
-						setCurrentUser(null);
+						console.log('refreshing token unsuccessful!', err)
 					}
 					// here, we return an exios instance with an err.config to exit the interceptor
 					return axios(err.config)

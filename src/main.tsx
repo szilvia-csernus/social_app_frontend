@@ -1,16 +1,17 @@
 import ReactDOM from 'react-dom/client'
-import App from './routes/App.tsx'
+import App from './pages/App.tsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css'
 import {
 	createBrowserRouter,
 	RouterProvider,
 } from 'react-router-dom';
-import ErrorPage from './routes/Error.tsx';
+import ErrorPage from './pages/Error.tsx';
 import RegisterForm from './auth/RegisterForm.tsx';
 import LogInForm from './auth/LogInForm.tsx';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
 import React from 'react';
+import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
 
 
 const router = createBrowserRouter([
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: 'login', element: <LogInForm /> },
 			{ path: 'register', element: <RegisterForm /> },
-			{ path: 'posts/create', element: 'Create Post' },
+			{ path: 'posts/create', element: <PostCreateEditForm /> },
 			{ path: 'liked', element: 'Liked elements' },
 			{ path: 'feed', element: 'Feed' },
 			{ path: 'profiles', element: 'Profiles page' },

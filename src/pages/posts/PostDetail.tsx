@@ -1,10 +1,12 @@
 import { useContext } from 'react';
 import classes from './Post.module.css';
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { Dispatch, SetStateAction, FC } from 'react';
+import { AccessKeyContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
-import { PostResultType } from './PostPage';
+import { type PostResultType } from './PostPage';
+import { axiosReq } from '../../api/axiosDefaults';
 
 
 type PostDetailProps = {
@@ -14,16 +16,16 @@ type PostDetailProps = {
 	profile_image: string;
 	comments_count: number;
 	likes_count: number;
-	like_id: number;
+	like_id: number | null;
 	title: string;
 	content: string;
 	image: string;
 	updated_at: string;
-	setPost: React.Dispatch<React.SetStateAction<PostResultType | null>>;
+	setPost: Dispatch<SetStateAction<PostResultType | null>>;
 	postPage: boolean;
 };
 
-const PostDetail: React.FC<PostDetailProps> = ({
+const PostDetail: FC<PostDetailProps> = ({
 		id,
 		owner,
 		profile_id,
@@ -41,6 +43,61 @@ const PostDetail: React.FC<PostDetailProps> = ({
 
     const currentUser = useContext(CurrentUserContext);
     const is_owner = currentUser?.username === owner;
+	const accessKey = useContext(AccessKeyContext);
+
+	const handleLike = async () => {
+		try {
+			const { data } = await axiosReq.post('/likes/',
+				{"post": id},
+				{
+					headers: {
+						Authorization: `Bearer ${accessKey}`,
+					}
+				})
+				if (data !== null) {
+					console.log('like response data', data)
+					setPost((prevPost: PostResultType | null) => {
+						if (prevPost === null) {
+							return null;
+						}
+						return {
+							...prevPost,
+							likes_count: likes_count + 1,
+							like_id: data.id,
+						};
+					});
+					console.log("like_id:", like_id, "postPage:", postPage)
+				}
+			
+		} catch(err) {
+			console.log(err)
+		}
+	}
+
+	const handleUnLike = async () => {
+		try {
+			await axiosReq.delete(
+				`/likes/${like_id}`,
+				{
+					headers: {
+						Authorization: `Bearer ${accessKey}`,
+					},
+				}
+			);
+			setPost((prevPost: PostResultType | null) => {
+				if (prevPost === null) {
+					return null;
+				}
+				return {
+					...prevPost,
+					likes_count: likes_count -1,
+					like_id: null,
+				};
+			});
+		} catch (err) {
+			console.log(err);
+		}
+	};
 
 	return (
 		<Card className={classes.post}>
@@ -68,11 +125,11 @@ const PostDetail: React.FC<PostDetailProps> = ({
                             <i className="far fa-heart" />
                         </OverlayTrigger>
                     ) : like_id ? (
-                        <span onClick={()=>{}}>
+                        <span onClick={handleUnLike}>
                             <i className={`fas fa-heart ${classes.heart}`} />
                         </span>
                     ) : currentUser ? (
-                        <span onClick={() => {}}>
+                        <span onClick={handleLike}>
                             <i className={`far fa-heart ${classes.heartOutline}`} />
                         </span>
                     ) : (

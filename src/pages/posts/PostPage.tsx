@@ -4,9 +4,10 @@ import Container from 'react-bootstrap/Container';
 
 import classes from './PostCreateEditForm.module.css';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { axiosReq } from '../../api/axiosDefaults';
 import PostDetail from './PostDetail';
+import { AccessKeyContext } from '../../contexts/CurrentUserContext';
 
 export type PostResultType = {
 	id: string;
@@ -15,7 +16,7 @@ export type PostResultType = {
 	profile_image: string;
 	comments_count: number;
 	likes_count: number;
-	like_id: number;
+	like_id: number | null;
 	title: string;
 	content: string;
 	image: string;
@@ -29,14 +30,19 @@ export type PostResultType = {
 const PostPage = () => {
 	const { id } = useParams();
     const [post, setPost] = useState<PostResultType| null>(null);
+    const accessKey = useContext(AccessKeyContext)
 
     useEffect(() => {
         const handleMount = async () => {
             try {
                 // Promise.all() returns an array of resolved data 
-                const [{data}] = await Promise.all([
-                    axiosReq.get<PostResultType>(`/posts/${id}`)
-                ])
+                const [{ data }] = await Promise.all([
+                    axiosReq.get<PostResultType>(`/posts/${id}`, {
+                        headers: {
+                            Authorization: `Bearer ${accessKey}`,
+                        },
+                    }),
+                ]);
                 if (data
                     // data.results &&
                     // data.results[0]
@@ -44,14 +50,14 @@ const PostPage = () => {
                         setPost(data);
                         // setPost(data.results[0]);
                     }
-                console.log(data)
+                console.log("post rendered by handleMount in useEffect", data)
             } catch(err) {
                 console.log(err)
             }
         }
 
         handleMount();
-    }, [id])
+    }, [id])  // if I add 'accessKey' to the dependency array, there'll be an infinite loop!!'
 
 	return (
 		<Row className="h-100">

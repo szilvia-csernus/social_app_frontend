@@ -23,6 +23,7 @@ export type UserContextType = {
 } | null;
 
 export const CurrentUserContext = createContext<UserContextType>(null);
+export const AccessKeyContext = createContext<string | null>(null);
 export const SetAccessKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
 export const SetRefreshKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
 
@@ -120,11 +121,13 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
     return (
 			<ErrorBoundary>
 				<CurrentUserContext.Provider value={currentUser}>
-					<SetAccessKeyContext.Provider value={setAccessKey}>
-						<SetRefreshKeyContext.Provider value={setRefreshKey}>
-							{children}
-						</SetRefreshKeyContext.Provider>
-					</SetAccessKeyContext.Provider>
+					<AccessKeyContext.Provider value={accessKey}>
+						<SetAccessKeyContext.Provider value={setAccessKey}>
+							<SetRefreshKeyContext.Provider value={setRefreshKey}>
+								{children}
+							</SetRefreshKeyContext.Provider>
+						</SetAccessKeyContext.Provider>
+					</AccessKeyContext.Provider>
 				</CurrentUserContext.Provider>
 			</ErrorBoundary>
 		);

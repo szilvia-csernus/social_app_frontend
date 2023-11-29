@@ -45,8 +45,8 @@ const PostDetail: React.FC<PostDetailProps> = ({
 	return (
 		<Card className={classes.post}>
 			<Card.Body>
-				<Card className="d-flex align-items-center justify-content-between">
-					<Link to={`/profiles/${profile_id}`}>
+				<div className="d-flex align-items-center justify-content-between">
+					<Link to={`/profiles/${profile_id}`} className="d-flex gap-2">
 						<Avatar src={profile_image} height={55} text="" />
 						{owner}
 					</Link>
@@ -54,7 +54,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
 						<span>{updated_at}</span>
 						{is_owner && postPage && '...'}
 					</div>
-				</Card>
+				</div>
 			</Card.Body>
 			<Link to={`/posts${id}`}>
 				<Card.Img src={image} alt={title} />
@@ -62,7 +62,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
             <Card.Body>
                 {title && <Card.Title className="text-center">{title}</Card.Title>}
                 {content && <Card.Text>{content}</Card.Text>}
-                <div className={classes.postBar}>
+                <div className={`${classes.postBar} d-flex gap-2 justify-content-center`}>
                     {is_owner ? (
                         <OverlayTrigger placement="top" overlay={<Tooltip>You can't like your own post!</Tooltip>}>
                             <i className="far fa-heart" />

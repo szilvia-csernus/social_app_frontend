@@ -22,9 +22,9 @@ export type PostResultType = {
 	updated_at: string;
 };
 
-type PostResults = {
-    results: PostResultType[]
-}
+// type PostResults = {
+//     results: PostResultType[]
+// }
 
 const PostPage = () => {
 	const { id } = useParams();
@@ -35,12 +35,14 @@ const PostPage = () => {
             try {
                 // Promise.all() returns an array of resolved data 
                 const [{data}] = await Promise.all([
-                    axiosReq.get<PostResults>(`/posts/${id}`)
+                    axiosReq.get<PostResultType>(`/posts/${id}`)
                 ])
-                if (data.results &&
-                    data.results[0]
+                if (data
+                    // data.results &&
+                    // data.results[0]
                     ) {
-                        setPost(data.results[0]);
+                        setPost(data);
+                        // setPost(data.results[0]);
                     }
                 console.log(data)
             } catch(err) {

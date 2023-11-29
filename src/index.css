@@ -47,8 +47,9 @@ input[type="file"] {
 }
 
 i {
-  /* font-size: 1.6rem; */
-  padding-right: .2rem;
+  font-size: 1.6rem;
+  padding-left: .7rem;
+  /* padding-right: .2rem; */
 }
 
 figure {

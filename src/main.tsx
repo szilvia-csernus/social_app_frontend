@@ -12,6 +12,7 @@ import LogInForm from './auth/LogInForm.tsx';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
 import React from 'react';
 import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
+import PostPage from './pages/posts/PostPage.tsx';
 
 
 const router = createBrowserRouter([
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
 			{ path: 'login', element: <LogInForm /> },
 			{ path: 'register', element: <RegisterForm /> },
 			{ path: 'posts/create', element: <PostCreateEditForm /> },
+			{ path: 'posts/:id', element: <PostPage /> },
 			{ path: 'liked', element: 'Liked elements' },
 			{ path: 'feed', element: 'Feed' },
 			{ path: 'profiles', element: 'Profiles page' },

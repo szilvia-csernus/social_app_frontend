@@ -1,0 +1,24 @@
+.post {
+    display: flex;
+    border: 1px solid #dadadf;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    text-align: center;
+
+}
+
+.post figure, h5 {
+    margin: 0;
+}
+
+.heart {
+    color: red;
+}
+
+.heart:hover {
+    color: rgb(54, 54, 168);
+}
+
+.heartOutline:hover {
+    color: rgb(254, 116, 116);
+}

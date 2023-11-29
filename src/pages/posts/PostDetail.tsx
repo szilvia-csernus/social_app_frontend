@@ -4,8 +4,10 @@ import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
+import { PostResultType } from './PostPage';
 
-type PostProps = {
+
+type PostDetailProps = {
 	id: string;
 	owner: string;
 	profile_id: number;
@@ -17,11 +19,11 @@ type PostProps = {
 	content: string;
 	image: string;
 	updated_at: string;
-    postPage: boolean;
+	setPost: React.Dispatch<React.SetStateAction<PostResultType | null>>;
+	postPage: boolean;
 };
 
-const Post = (props: PostProps) => {
-	const {
+const PostDetail: React.FC<PostDetailProps> = ({
 		id,
 		owner,
 		profile_id,
@@ -33,8 +35,9 @@ const Post = (props: PostProps) => {
 		content,
 		image,
 		updated_at,
+		setPost,
         postPage,
-	} = props;
+	}) => {
 
     const currentUser = useContext(CurrentUserContext);
     const is_owner = currentUser?.username === owner;
@@ -89,4 +92,4 @@ const Post = (props: PostProps) => {
 };
 
 
-export default Post;
+export default PostDetail;

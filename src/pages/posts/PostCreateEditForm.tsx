@@ -8,8 +8,8 @@ import Container from 'react-bootstrap/Container';
 
 import Upload from '../../assets/upload.svg';
 
-import classes from './PostCreateEditForm.module.css';
-// import appStyles from '../../App.module.css';
+import classes from './Post.module.css';
+
 import btnClasses from '../../components/Button.module.css';
 import Asset from '../../components/Asset';
 import { Alert, Image } from 'react-bootstrap';

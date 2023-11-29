@@ -22,3 +22,18 @@
 .heartOutline:hover {
     color: rgb(254, 116, 116);
 }
+
+.container {
+  min-height: 343px;
+}
+
+.content {
+  background-color: var(--bs-body-bg);
+  padding: 1rem;
+}
+
+.image {
+  max-height: 40vh;
+  max-width: 100%;
+  object-fit: contain;
+}

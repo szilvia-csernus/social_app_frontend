@@ -1,0 +1,86 @@
+import { useContext, type FC, useState, useEffect } from 'react';
+
+import Form from 'react-bootstrap/Form';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+
+import classes from './Post.module.css';
+import { axiosReq } from '../../api/axiosDefaults';
+import { useLocation, useNavigation } from 'react-router-dom';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import Modal from '../../components/Modal';
+import Spinner from '../../components/Spinner';
+import PostDetail from './PostDetail';
+
+type PostsProps = {
+    message: string;
+	filter: string;
+}
+
+
+
+const PostsPage: FC<PostsProps> = ({ message, filter = "" }) => {	
+	const currentUser = useContext(CurrentUserContext);
+	const profile_id = currentUser ?.profile_id || "";
+
+	const [posts, setPosts] = useState({ results: [] });
+	const [hasLoaded, setHasLoaded] = useState(false);
+	const { pathname } = useLocation();
+	
+	const navigation = useNavigation();
+
+	switch (pathname) {
+		case "feed":
+			filter = `owner__followed__owner__profile=${profile_id}&`;
+			break;
+		case "liked":
+			filter = `likes__owner__profile=${profile_id}&ordering=-likes__created_at&`;
+			break;
+	}
+
+	useEffect(() => {
+		const fetchPosts = async () => {
+			try {
+				const { data } = await axiosReq.get(`/posts/?${filter}`);
+				setPosts(data);
+				setHasLoaded(true)
+			} catch (err) {
+				console.log(err)
+			} 
+		}
+
+		setHasLoaded(false)
+		fetchPosts()
+	}, [filter, pathname])
+
+    
+	return (
+		<Row className="h-100">
+			{navigation.state === 'loading' && (
+				<Modal>
+					<Spinner />
+				</Modal>
+			)}
+			<Col className="py-2 p-0 p-lg-2" lg={8}>
+				<p>Popular profiles mobile</p>
+				{hasLoaded ? (
+					<>{posts.results.length
+						? posts.results.map((post) => (
+							<PostDetail key={post.id} {...post} setPosts={setPosts}/>
+						))
+						: console.log("show no results asset.")
+						}
+					</>
+				) : (
+					<>{console.log("show loading spinner")}</>
+				)}
+			</Col>
+			<Col md={4} className="d-none d-lg-block p-0 p-lg-2">
+				<p>Popular profiles for desktop</p>
+			</Col>
+		</Row>
+	);
+}
+
+export default PostsPage;

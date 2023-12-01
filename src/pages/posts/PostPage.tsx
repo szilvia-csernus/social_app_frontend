@@ -2,7 +2,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 
-import classes from './PostCreateEditForm.module.css';
+import classes from './Post.module.css';
 import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { axiosReq } from '../../api/axiosDefaults';
@@ -50,7 +50,7 @@ const PostPage = () => {
                         setPost(data);
                         // setPost(data.results[0]);
                     }
-                console.log("post rendered by handleMount in useEffect", data)
+                console.log("post rendered by PostPage handleMount in useEffect", data)
             } catch(err) {
                 console.log(err)
             }

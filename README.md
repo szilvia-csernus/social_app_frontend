@@ -35,6 +35,7 @@ If you are developing a production application, we recommend updating the config
 
 Logo: https://www.svgrepo.com/svg/489904/connect
 Upload icon: https://www.svgrepo.com/svg/530396/upload
+No results icon: https://www.svgrepo.com/svg/530386/magnifying-glass-find-search
 Background color: https://cssgradient.io/swatches/
 Illustrations: https://undraw.co/
 

@@ -11,6 +11,7 @@ import {
 import axios from 'axios';
 import { axiosReq, axiosRes } from '../api/axiosDefaults';
 import ErrorBoundary from '../ErrorBoundary';
+import { redirect } from 'react-router-dom';
 
 export type UserContextType = {
 	pk: number;
@@ -56,6 +57,9 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 				
 			} catch (err) {
 				console.log('fetchCurrentUser function, Access Key invalid, error:', err);
+				if (currentUser) {  // there was a user previously logged in
+					redirect('/login')
+				}
 				setCurrentUser(null)
 				console.log('currentUser set to null!')
 			}

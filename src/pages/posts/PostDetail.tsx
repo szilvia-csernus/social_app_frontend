@@ -1,10 +1,7 @@
 import { useContext } from 'react';
 import classes from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import {
-	AccessKeyContext,
-	CurrentUserContext,
-} from '../../contexts/CurrentUserContext';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';

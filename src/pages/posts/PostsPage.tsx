@@ -1,11 +1,11 @@
 import { useContext, type FC, useState, useEffect } from 'react';
 
-import Form from 'react-bootstrap/Form';
+// import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Container from 'react-bootstrap/Container';
+// import Container from 'react-bootstrap/Container';
 
-import classes from './Post.module.css';
+// import classes from './Post.module.css';
 import { axiosReq } from '../../api/axiosDefaults';
 import { useLocation, useNavigation } from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
@@ -37,14 +37,21 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	
 	const navigation = useNavigation();
 
-	switch (pathname) {
-		case "feed":
-			setFilter(`owner__followed__owner__profile=${profile_id}&`);
-			break;
-		case "liked":
-			setFilter(`likes__owner__profile=${profile_id}&ordering=-likes__created_at&`);
-			break;
-	}
+	useEffect(() => {
+		switch (pathname) {
+			case '/feed':
+				setFilter(`owner__followed__owner__profile=${profile_id}&`);
+				break;
+			case '/liked':
+				setFilter(
+					`likes__owner__profile=${profile_id}&ordering=-likes__created_at&`
+				);
+				break;
+		}
+	}, [pathname, profile_id]);
+
+	console.log(pathname)
+	console.log("filter", filter);
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -77,7 +84,11 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 						? posts.results.map((post) => (
 							<PostDetail key={post.id} {...post} setPosts={setPosts} postPage={false}/>
 						))
-						: console.log("show no results asset.")
+						: 
+						<>
+						{ message }
+						{console.log("show no results asset")}
+						</>
 						}
 					</>
 				) : (

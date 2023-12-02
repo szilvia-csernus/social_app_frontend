@@ -11,31 +11,38 @@ import { useLocation, useNavigation } from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
-import PostDetail from './PostDetail';
+import PostDetail, { type PostType } from './PostDetail';
 
 type PostsProps = {
     message: string;
-	filter: string;
+}
+
+export type PostsType = {
+	count: number;
+	next: string | null;
+	previous: string | null;
+	results: PostType[]
 }
 
 
 
-const PostsPage: FC<PostsProps> = ({ message, filter = "" }) => {	
+const PostsPage: FC<PostsProps> = ({ message }) => {	
 	const currentUser = useContext(CurrentUserContext);
 	const profile_id = currentUser ?.profile_id || "";
 
-	const [posts, setPosts] = useState({ results: [] });
+	const [posts, setPosts] = useState<PostsType>({ count: 0, next: null, previous: null, results: [] });
 	const [hasLoaded, setHasLoaded] = useState(false);
+	const [filter, setFilter] = useState("");
 	const { pathname } = useLocation();
 	
 	const navigation = useNavigation();
 
 	switch (pathname) {
 		case "feed":
-			filter = `owner__followed__owner__profile=${profile_id}&`;
+			setFilter(`owner__followed__owner__profile=${profile_id}&`);
 			break;
 		case "liked":
-			filter = `likes__owner__profile=${profile_id}&ordering=-likes__created_at&`;
+			setFilter(`likes__owner__profile=${profile_id}&ordering=-likes__created_at&`);
 			break;
 	}
 
@@ -44,6 +51,7 @@ const PostsPage: FC<PostsProps> = ({ message, filter = "" }) => {
 			try {
 				const { data } = await axiosReq.get(`/posts/?${filter}`);
 				setPosts(data);
+				console.log(data)
 				setHasLoaded(true)
 			} catch (err) {
 				console.log(err)
@@ -67,7 +75,7 @@ const PostsPage: FC<PostsProps> = ({ message, filter = "" }) => {
 				{hasLoaded ? (
 					<>{posts.results.length
 						? posts.results.map((post) => (
-							<PostDetail key={post.id} {...post} setPosts={setPosts}/>
+							<PostDetail key={post.id} {...post} setPosts={setPosts} postPage={false}/>
 						))
 						: console.log("show no results asset.")
 						}

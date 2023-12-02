@@ -1,5 +1,6 @@
 import {
 	Dispatch,
+	FC,
 	ReactNode,
 	SetStateAction,
 	createContext,
@@ -36,7 +37,7 @@ type CurrentUserProviderProps = {
 const storedAccessKey = localStorage.getItem('access') || '';
 const storedRrefreshKey = localStorage.getItem('refresh') || '';
 
-export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
+export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children }) => {
 	console.log('CurrentUserProvider runs')
 	const [currentUser, setCurrentUser] = useState(null);
 	const [accessKey, setAccessKey] = useState(storedAccessKey);
@@ -53,7 +54,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 					},
 				});
 				setCurrentUser(data);
-				console.log('fetchCurrentUser function, setCurrentUser:', data);
+				console.log('fetchCurrentUser function, Access Key VALID, setCurrentUser:', data);
 				
 			} catch (err) {
 				console.log('fetchCurrentUser function, Access Key invalid, error:', err);
@@ -65,8 +66,9 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 			}
 		} else {
 			setCurrentUser(null)
+			console.log('currentUser set to null!');
 		}
-	}, [accessKey]);
+	}, [accessKey]); // if I include 'currentUser, I'd initiate an infinite loop!
 			
 
 	useEffect(() => {
@@ -87,8 +89,13 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 						refresh: refreshKey,
 					});
 					setAccessKey(data.access);
+					console.log('Access Key refreshed!!');
 					localStorage.setItem('access', data.access);
 					console.log('access data set for localstorage', data);
+
+					// Add the new accessKey as a Bearer token in the Authorization header
+					config.headers.Authorization = `Bearer ${data.access}`;
+					
 				} catch (err) {
 					setCurrentUser(null);
 					return config
@@ -99,6 +106,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 				return Promise.reject(err)
 			}
 		)
+
 		axiosRes.interceptors.response.use(
 			(response) => response,
 			async (err) => {
@@ -108,6 +116,7 @@ export const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
 							refresh: refreshKey,
 						});
 						setAccessKey(data.access);
+						console.log('Access Key refreshed!!');
 						localStorage.setItem('access', data.access);
 						console.log('access data set during interception', data);
 					} catch (err) {

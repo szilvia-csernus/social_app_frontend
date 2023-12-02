@@ -60,7 +60,11 @@ const RegisterForm = () => {
 		event.preventDefault();
 
 		try {
-			await axios.post('dj-rest-auth/registration/', registerData);
+			await axios.post('dj-rest-auth/registration/', registerData, {
+				headers: {
+					"Content-Type": 'multipsrt/form-data',
+				}
+			});
 			// navigate('login');
 		} catch (error) {
 			console.log(error)

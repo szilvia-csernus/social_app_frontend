@@ -7,7 +7,7 @@ import ErrorPage from './pages/Error.tsx';
 import RegisterForm from './auth/RegisterForm.tsx';
 import LogInForm from './auth/LogInForm.tsx';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
-import React from 'react';
+// import React from 'react';
 import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
 import PostPage from './pages/posts/PostPage.tsx';
 import PostsPage from './pages/posts/PostsPage.tsx';
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<React.StrictMode>
+	// <React.StrictMode>
 		<CurrentUserProvider>
 			<RouterProvider
 				router={router}
@@ -62,5 +62,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				}
 			/>
 		</CurrentUserProvider>
-	</React.StrictMode>
+	// </React.StrictMode>
 );

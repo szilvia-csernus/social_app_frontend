@@ -7,9 +7,9 @@ import illustration from '../assets/login.svg';
 
 import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetAccessKeyContext, SetRefreshKeyContext } from '../contexts/CurrentUserContext';
+import { RefreshKeyContext, SetAccessKeyContext } from '../contexts/CurrentUserContext';
 
 type logInDataType = {
 	username: string,
@@ -34,7 +34,7 @@ type ErrorResponse = {
 
 const LogInForm = () => {
 	const setAccessKey = useContext(SetAccessKeyContext);
-	const setRefreshKey = useContext(SetRefreshKeyContext);
+	const RefreshKeyRef = useContext(RefreshKeyContext);
 
 	const [logInData, setLogInData] = useState<logInDataType>({
 		username: '',
@@ -45,7 +45,7 @@ const LogInForm = () => {
 
 	const { username, password } = logInData;
 
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = event.target;
@@ -65,11 +65,11 @@ const LogInForm = () => {
 			if (loginData.status === 200) {
 				const {data} = await axios.post('api/token/', logInData);
 				setAccessKey(data.access);
-				setRefreshKey(data.refresh);
+				RefreshKeyRef!.current = data.refresh;
 				localStorage.setItem("access", data.access);
 				localStorage.setItem("refresh", data.refresh);
 				console.log("tokens set in localstorage", data)
-				navigate('/feed');
+				// navigate('/feed');
 			}
 		} catch (error) {
 			console.log(error);

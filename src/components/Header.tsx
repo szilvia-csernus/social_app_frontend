@@ -9,9 +9,9 @@ import classes from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
 	CurrentUserContext,
-	SetAccessKeyContext,
-	SetRefreshKeyContext,
+	RefreshKeyContext,
 	type UserContextType,
+	SetAccessKeyContext,
 } from '../contexts/CurrentUserContext';
 import Avatar from './Avatar';
 import axios from 'axios';
@@ -20,7 +20,7 @@ import useClickOutsideToggle from '../hooks/useClickOutsideToggle';
 function Header() {
 	const currentUser: UserContextType = useContext(CurrentUserContext);
 	const setAccessKey = useContext(SetAccessKeyContext);
-	const setRefreshKey = useContext(SetRefreshKeyContext);
+	const RefreshKeyRef = useContext(RefreshKeyContext);
 
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
 
@@ -28,9 +28,10 @@ function Header() {
 		const response = await axios.post('dj-rest-auth/logout/');
 		if (response.status === 200) {
 			setAccessKey('');
-			setRefreshKey('');
+			RefreshKeyRef!.current = '';
 			localStorage.setItem('access', '');
 			localStorage.setItem('refresh', '');
+			console.log('both access and refresh keys been cleared from everywhere!!')
 		} else {
 			console.log('Logout unsuccessful', response);
 		}

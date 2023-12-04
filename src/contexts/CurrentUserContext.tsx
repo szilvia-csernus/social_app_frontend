@@ -7,6 +7,7 @@ import {
 	createContext,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -53,7 +54,7 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 
 		if (accessKey !== '') {
 			try {
-				const { data } = await axios.get('dj-rest-auth/user', {
+				const { data } = await axiosRes.get('dj-rest-auth/user', {
 					headers: {
 						Authorization: `Bearer ${accessKey}`,
 					},
@@ -81,15 +82,15 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 	}, [accessKey]); // if I include 'currentUser, I'd initiate an infinite loop!
 
 	useEffect(() => {
-		console.log('useEffect runs');
+		console.log('useEffect in CurrentUserContext runs');
 		fetchCurrentUser();
 	}, [fetchCurrentUser]);
 
 	// useMemo runs before the children get mounted. That allows the axios interceptor to deliver
 	// the requested current user data.
 
-	useCallback(() => {
-		console.log('useCallback for interceptors runs');
+	useMemo(() => {
+		console.log('useMemo for interceptors runs');
 
 		axiosReq.interceptors.request.use(
 			async (config) => {
@@ -125,6 +126,7 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 			async (err) => {
 				if (err.response?.status === 401) {
 					try {
+						console.log('axiosRes interceptor makes a call to refresh token.')
 						const { data } = await axios.post('api/token/refresh/', {
 							refresh: refreshKeyRef.current,
 						});

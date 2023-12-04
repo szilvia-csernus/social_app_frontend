@@ -1,14 +1,14 @@
 import {
 	Dispatch,
 	FC,
-	MutableRefObject,
+	// MutableRefObject,
 	ReactNode,
 	SetStateAction,
 	createContext,
 	useCallback,
 	useEffect,
-	useMemo,
-	useRef,
+	// useMemo,
+	// useRef,
 	useState,
 } from 'react';
 import axios from 'axios';
@@ -29,14 +29,15 @@ export type UserContextType = {
 export const CurrentUserContext = createContext<UserContextType>(null);
 export const AccessKeyContext = createContext<string | null>(null);
 export const SetAccessKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
-export const RefreshKeyContext = createContext<MutableRefObject<string> | null>(null);
+export const SetRefreshKeyContext = createContext<Dispatch<SetStateAction<string>>>(() => {});
+// export const RefreshKeyContext = createContext<MutableRefObject<string> | null>(null);
 
 type CurrentUserProviderProps = {
 	children: ReactNode;
 };
 
 const storedAccessKey = localStorage.getItem('access') || '';
-const storedRrefreshKey = localStorage.getItem('refresh') || '';
+const storedRefreshKey = localStorage.getItem('refresh') || '';
 
 export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 	children,
@@ -44,10 +45,11 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 	console.log('CurrentUserProvider runs');
 	const [currentUser, setCurrentUser] = useState(null);
 	const [accessKey, setAccessKey] = useState(storedAccessKey);
+	const [refreshKey, setRefreshKey] = useState(storedRefreshKey);
 	// refreshKey is stored in a ref. If it was stored in State, there would be an infinite loop 
 	// within the useCallback() function for the interceptors because useCallback() clears the refreshKey 
 	// if it was invalid causing it to re-run itself.
-	const refreshKeyRef = useRef(storedRrefreshKey);
+	// const refreshKeyRef = useRef(storedRrefreshKey);
 
 	const fetchCurrentUser = useCallback(async () => {
 		console.log('fetchCurrentUser runs');
@@ -89,14 +91,14 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 	// useMemo runs before the children get mounted. That allows the axios interceptor to deliver
 	// the requested current user data.
 
-	useMemo(() => {
-		console.log('useMemo for interceptors runs');
+	useCallback(() => {
+		console.log('useEffect() for interceptors runs');
 
-		axiosReq.interceptors.request.use(
+		const axiosReqInterceptor = axiosReq.interceptors.request.use(
 			async (config) => {
 				try {
 					const { data } = await axios.post('api/token/refresh/', {
-						refresh: refreshKeyRef.current,
+						refresh: refreshKey,
 					});
 					// if ( data.access !== accessKey ) {
 					setAccessKey(data.access);
@@ -111,7 +113,7 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 					// if (accessKey !== '') {
 					setAccessKey('');
 					// }
-					refreshKeyRef.current = '';
+					
 					return config;
 				}
 				return config;
@@ -121,14 +123,14 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 			}
 		);
 
-		axiosRes.interceptors.response.use(
+		const axiosResInterceptor = axiosRes.interceptors.response.use(
 			(response) => response,
 			async (err) => {
 				if (err.response?.status === 401) {
 					try {
 						console.log('axiosRes interceptor makes a call to refresh token.')
 						const { data } = await axios.post('api/token/refresh/', {
-							refresh: refreshKeyRef.current,
+							refresh: refreshKey,
 						});
 						// if (data.access !== accessKey) {
 						setAccessKey(data.access);
@@ -146,16 +148,20 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 				return Promise.reject(err);
 			}
 		);
-	}, [refreshKeyRef]);
+		return () => {
+			axiosReq.interceptors.request.eject(axiosReqInterceptor);
+			axiosRes.interceptors.response.eject(axiosResInterceptor);
+		};
+	},[refreshKey]);
 
 	return (
 		<ErrorBoundary>
 			<CurrentUserContext.Provider value={currentUser}>
 				<AccessKeyContext.Provider value={accessKey}>
 					<SetAccessKeyContext.Provider value={setAccessKey}>
-						<RefreshKeyContext.Provider value={refreshKeyRef}>
+						<SetRefreshKeyContext.Provider value={setRefreshKey}>
 							{children}
-						</RefreshKeyContext.Provider>
+						</SetRefreshKeyContext.Provider>
 					</SetAccessKeyContext.Provider>
 				</AccessKeyContext.Provider>
 			</CurrentUserContext.Provider>

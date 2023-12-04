@@ -6,8 +6,8 @@ import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
 // import classes from './Post.module.css';
-import { axiosRes } from '../../api/axiosDefaults';
-import { useLocation, useNavigation } from 'react-router-dom';
+import { axiosReq } from '../../api/axiosDefaults';
+import { useLocation} from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
@@ -33,8 +33,6 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	const [hasLoaded, setHasLoaded] = useState(false);
 	const [filter, setFilter] = useState("");
 	const { pathname } = useLocation();
-	
-	const navigation = useNavigation();
 
 	useMemo(() => {
 		console.log('useMemo() for set filtering in PostPage runs')
@@ -57,7 +55,7 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 		console.log('useMemo() for fetching posts in PostsPage runs')
 		const fetchPosts = async () => {
 			try {
-				const { data } = await axiosRes.get(`/posts/?${filter}`);
+				const { data } = await axiosReq.get(`/posts/?${filter}`);
 				setPosts(data);
 				console.log(data)
 				setHasLoaded(true)
@@ -73,11 +71,6 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
     
 	return (
 		<Row className="h-100">
-			{navigation.state === 'loading' && (
-				<Modal>
-					<Spinner />
-				</Modal>
-			)}
 			<Col className="py-2 p-0 p-lg-2" lg={8}>
 				<p>Popular profiles mobile</p>
 				{hasLoaded ? (
@@ -93,7 +86,9 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 						}
 					</>
 				) : (
-					<>{console.log("show loading spinner")}</>
+					<Modal>
+					<Spinner />
+				</Modal>
 				)}
 			</Col>
 			<Col md={4} className="d-none d-lg-block p-0 p-lg-2">

@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 import classes from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { CurrentUserContext, RefreshKeyContext, SetAccessKeyContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
-import { axiosReq } from '../../api/axiosDefaults';
 import { type PostsType } from './PostsPage';
+import axios from 'axios';
 
 export type PostType = {
 	id: string;
@@ -44,13 +44,24 @@ const PostDetail: FC<PostDetailProps> = ({
 }) => {
     
 	const currentUser = useContext(CurrentUserContext);
+	const refreshKey = useContext(RefreshKeyContext);
+	const setAccessKey = useContext(SetAccessKeyContext)
 	const isPostOwner = currentUser ? currentUser.username === owner : false;
 
 	const handleLike = async () => {
 		try {
-			const { data } = await axiosReq.post(
+			const accessKeyData = await axios.post('api/token/refresh/', {
+				refresh: refreshKey,
+			});
+			setAccessKey(accessKeyData.data.access);
+			const { data } = await axios.post(
 				'/likes/',
-				{ post: id }
+				{ post: id },
+				{
+					headers: {
+						Authorization: `Bearer ${accessKeyData.data.access}`,
+					},
+				}
 			);
 			if (data !== null) {
 				console.log('like response data', data);
@@ -77,7 +88,15 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	const handleUnLike = async () => {
 		try {
-			await axiosReq.delete(`/likes/${like_id}`);
+			const accessKeyData = await axios.post('api/token/refresh/', {
+				refresh: refreshKey,
+			});
+			setAccessKey(accessKeyData.data.access);
+			await axios.delete(`/likes/${like_id}`, {
+				headers: {
+					Authorization: `Bearer ${accessKeyData.data.access}`,
+				},
+			});
 			setPosts((prevPosts: PostsType) => {
 				const indx = prevPosts.results.findIndex((post) => post.id === id);
 				const updatedResults = [...prevPosts.results];

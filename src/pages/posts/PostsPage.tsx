@@ -1,4 +1,4 @@
-import { useContext, type FC, useState, useMemo } from 'react';
+import { useContext, type FC, useState, useMemo, useEffect } from 'react';
 
 // import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -6,36 +6,47 @@ import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
 // import classes from './Post.module.css';
-import { axiosReq } from '../../api/axiosDefaults';
-import { useLocation} from 'react-router-dom';
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { axiosRes } from '../../api/axiosDefaults';
+import { useLocation } from 'react-router-dom';
+import {
+	CurrentUserContext,
+	RefreshKeyContext,
+	SetAccessKeyContext,
+} from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
 import PostDetail, { type PostType } from './PostDetail';
+import axios from 'axios';
 
 type PostsProps = {
-    message: string;
-}
+	message: string;
+};
 
 export type PostsType = {
 	count: number;
 	next: string | null;
 	previous: string | null;
-	results: PostType[]
-}
+	results: PostType[];
+};
 
-
-const PostsPage: FC<PostsProps> = ({ message }) => {	
+const PostsPage: FC<PostsProps> = ({ message }) => {
 	const currentUser = useContext(CurrentUserContext);
-	const profile_id = currentUser ?.profile_id || "";
+	const setAccessKey = useContext(SetAccessKeyContext);
+	const refreshKey = useContext(RefreshKeyContext)
+	const profile_id = currentUser?.profile_id || '';
 
-	const [posts, setPosts] = useState<PostsType>({ count: 0, next: null, previous: null, results: [] });
+	const [posts, setPosts] = useState<PostsType>({
+		count: 0,
+		next: null,
+		previous: null,
+		results: [],
+	});
 	const [hasLoaded, setHasLoaded] = useState(false);
-	const [filter, setFilter] = useState("");
+	const [filter, setFilter] = useState('');
 	const { pathname } = useLocation();
 
 	useMemo(() => {
-		console.log('useMemo() for set filtering in PostPage runs')
+		console.log('useMemo() for set filtering in PostPage runs');
 		switch (pathname) {
 			case '/feed':
 				setFilter(`owner__followed__owner__profile=${profile_id}&`);
@@ -48,47 +59,60 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 		}
 	}, [pathname, profile_id]);
 
-	console.log(pathname)
-	console.log("filter", filter);
+	console.log(pathname);
+	console.log('filter', filter);
 
-	useMemo(() => {
-		console.log('useMemo() for fetching posts in PostsPage runs')
+	useEffect(() => {
+		console.log('useEffect() for fetching posts in PostsPage runs');
 		const fetchPosts = async () => {
 			try {
-				const { data } = await axiosReq.get(`/posts/?${filter}`);
-				setPosts(data);
-				console.log(data)
-				setHasLoaded(true)
+				const accessKeyData = await axios.post('api/token/refresh/', {
+					refresh: refreshKey,
+				});
+				setAccessKey(accessKeyData.data.access);
+				const postData = await axiosRes.get(`/posts/?${filter}`, {
+					headers: {
+						Authorization: `Bearer ${accessKeyData.data.access}`,
+					},
+				});
+				setPosts(postData.data);
+				console.log("posts set to: ", postData.data);
+				setHasLoaded(true);
 			} catch (err) {
-				console.log(err)
-			} 
-		}
+				console.log(err);
+			}
+		};
 
-		setHasLoaded(false)
-		fetchPosts()
-	}, [filter])
+		setHasLoaded(false);
+		fetchPosts();
+	}, [filter, refreshKey, setAccessKey]);
 
-    
 	return (
 		<Row className="h-100">
 			<Col className="py-2 p-0 p-lg-2" lg={8}>
 				<p>Popular profiles mobile</p>
 				{hasLoaded ? (
-					<>{posts.results.length
-						? posts.results.map((post) => (
-							<PostDetail key={post.id} {...post} setPosts={setPosts} postPage={false}/>
-						))
-						: 
-						<>
-						{ message }
-						{console.log("show no results asset")}
-						</>
-						}
+					<>
+						{posts.results.length ? (
+							posts.results.map((post) => (
+								<PostDetail
+									key={post.id}
+									{...post}
+									setPosts={setPosts}
+									postPage={false}
+								/>
+							))
+						) : (
+							<>
+								{message}
+								{console.log('show no results asset')}
+							</>
+						)}
 					</>
 				) : (
 					<Modal>
-					<Spinner />
-				</Modal>
+						<Spinner />
+					</Modal>
 				)}
 			</Col>
 			<Col md={4} className="d-none d-lg-block p-0 p-lg-2">
@@ -96,6 +120,6 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 			</Col>
 		</Row>
 	);
-}
+};
 
 export default PostsPage;

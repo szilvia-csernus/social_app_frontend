@@ -1,4 +1,4 @@
-import { useContext, type FC, useState, useEffect } from 'react';
+import { useContext, type FC, useState, useMemo } from 'react';
 
 // import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
 // import classes from './Post.module.css';
-import { axiosReq } from '../../api/axiosDefaults';
+import { axiosRes } from '../../api/axiosDefaults';
 import { useLocation, useNavigation } from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
@@ -25,7 +25,6 @@ export type PostsType = {
 }
 
 
-
 const PostsPage: FC<PostsProps> = ({ message }) => {	
 	const currentUser = useContext(CurrentUserContext);
 	const profile_id = currentUser ?.profile_id || "";
@@ -37,7 +36,8 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	
 	const navigation = useNavigation();
 
-	useEffect(() => {
+	useMemo(() => {
+		console.log('useMemo() for set filtering in PostPage runs')
 		switch (pathname) {
 			case '/feed':
 				setFilter(`owner__followed__owner__profile=${profile_id}&`);
@@ -53,10 +53,11 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	console.log(pathname)
 	console.log("filter", filter);
 
-	useEffect(() => {
+	useMemo(() => {
+		console.log('useMemo() for fetching posts in PostsPage runs')
 		const fetchPosts = async () => {
 			try {
-				const { data } = await axiosReq.get(`/posts/?${filter}`);
+				const { data } = await axiosRes.get(`/posts/?${filter}`);
 				setPosts(data);
 				console.log(data)
 				setHasLoaded(true)
@@ -67,7 +68,7 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 
 		setHasLoaded(false)
 		fetchPosts()
-	}, [filter, pathname])
+	}, [filter])
 
     
 	return (

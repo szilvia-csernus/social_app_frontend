@@ -1,4 +1,4 @@
-import { useContext, type FC, useState, useMemo, useEffect } from 'react';
+import { useContext, type FC, useState, useEffect } from 'react';
 
 // import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -32,8 +32,8 @@ export type PostsType = {
 const PostsPage: FC<PostsProps> = ({ message }) => {
 	const currentUser = useContext(CurrentUserContext);
 	const setAccessKey = useContext(SetAccessKeyContext);
-	const refreshKey = useContext(RefreshKeyContext)
-	const profile_id = currentUser?.profile_id || '';
+	const refreshKey = useContext(RefreshKeyContext);
+	// const profile_id = currentUser?.profile_id || '';
 
 	const [posts, setPosts] = useState<PostsType>({
 		count: 0,
@@ -45,41 +45,54 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	const [filter, setFilter] = useState('');
 	const { pathname } = useLocation();
 
-	useMemo(() => {
-		console.log('useMemo() for set filtering in PostPage runs');
-		switch (pathname) {
-			case '/feed':
-				setFilter(`owner__followed__owner__profile=${profile_id}&`);
-				break;
-			case '/liked':
-				setFilter(
-					`likes__owner__profile=${profile_id}&ordering=-likes__created_at&`
-				);
-				break;
+	useEffect(() => {
+		console.log('useEffect() for set filtering in PostPage runs');
+		if (currentUser) {
+			switch (pathname) {
+				case '/feed':
+					setFilter(`owner__followed__owner__profile=${currentUser.profile_id}&`);
+					break;
+				case '/liked':
+					setFilter(
+						`likes__owner__profile=${currentUser.profile_id}&ordering=-likes__created_at&`
+					);
+					break;
+			}
+		} else {
+			setFilter("");
 		}
-	}, [pathname, profile_id]);
+	}, [pathname, currentUser]);
 
 	console.log(pathname);
 	console.log('filter', filter);
 
 	useEffect(() => {
 		console.log('useEffect() for fetching posts in PostsPage runs');
+		let postData;
 		const fetchPosts = async () => {
 			try {
 				const accessKeyData = await axios.post('api/token/refresh/', {
 					refresh: refreshKey,
 				});
-				setAccessKey(accessKeyData.data.access);
-				const postData = await axiosRes.get(`/posts/?${filter}`, {
-					headers: {
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				});
+				if (accessKeyData.data.access) {
+					setAccessKey(accessKeyData.data.access);
+					postData = await axiosRes.get(`/posts/?${filter}`, {
+						headers: {
+							Authorization: `Bearer ${accessKeyData.data.access}`,
+						},
+					});
+				} else {
+					postData = await axiosRes.get(`/posts/?${filter}`);
+				}
+
 				setPosts(postData.data);
-				console.log("posts set to: ", postData.data);
+				console.log('posts set to: ', postData.data);
 				setHasLoaded(true);
 			} catch (err) {
 				console.log(err);
+				postData = await axiosRes.get('/posts/');
+				setPosts(postData.data);
+				setHasLoaded(true);
 			}
 		};
 

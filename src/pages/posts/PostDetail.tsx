@@ -1,12 +1,13 @@
 import { useContext } from 'react';
 import classes from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { CurrentUserContext, RefreshKeyContext, SetAccessKeyContext } from '../../contexts/CurrentUserContext';
+import { RefreshKeyContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { type PostsType } from './PostsPage';
 import axios from 'axios';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 export type PostType = {
 	id: string;
@@ -43,9 +44,9 @@ const PostDetail: FC<PostDetailProps> = ({
 	postPage,
 }) => {
     
-	const currentUser = useContext(CurrentUserContext);
+	const currentUser = useCurrentUser();
 	const refreshKey = useContext(RefreshKeyContext);
-	const setAccessKey = useContext(SetAccessKeyContext)
+	// const setAccessKey = useContext(SetAccessKeyContext)
 	const isPostOwner = currentUser ? currentUser.username === owner : false;
 
 	const handleLike = async () => {
@@ -53,7 +54,7 @@ const PostDetail: FC<PostDetailProps> = ({
 			const accessKeyData = await axios.post('api/token/refresh/', {
 				refresh: refreshKey,
 			});
-			setAccessKey(accessKeyData.data.access);
+			// setAccessKey(accessKeyData.data.access);
 			const { data } = await axios.post(
 				'/likes/',
 				{ post: id },
@@ -91,7 +92,7 @@ const PostDetail: FC<PostDetailProps> = ({
 			const accessKeyData = await axios.post('api/token/refresh/', {
 				refresh: refreshKey,
 			});
-			setAccessKey(accessKeyData.data.access);
+			// setAccessKey(accessKeyData.data.access);
 			await axios.delete(`/likes/${like_id}`, {
 				headers: {
 					Authorization: `Bearer ${accessKeyData.data.access}`,

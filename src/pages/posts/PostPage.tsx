@@ -5,9 +5,10 @@ import Container from 'react-bootstrap/Container';
 import classes from './Post.module.css';
 import { useParams } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
-import { axiosReq } from '../../api/axiosDefaults';
+// import { axiosReq } from '../../api/axiosDefaults';
 import PostDetail, { PostType } from './PostDetail';
 import { PostsType } from './PostsPage';
+import axios from 'axios';
 
 // type PostResults = {
 //     results: PostResultType[]
@@ -27,7 +28,7 @@ const PostPage: FC = () => {
 			try {
 				// Promise.all() returns an array of resolved data
 				const [{ data }] = await Promise.all([
-					axiosReq.get<PostType>(`/posts/${id}`),
+					axios.get<PostType>(`/posts/${id}`),
 				]);
 				if (
 					data
@@ -52,7 +53,7 @@ const PostPage: FC = () => {
 		<Row className="h-100">
 			<Col className="py-2 p-0 p-lg-2" lg={8}>
 				<p>Popular profiles for mobile</p>
-				{/* postPage will evaluate as truthy */}
+				{/* postPage will evaluate as truthy inside this PostPage component! */}
 				{<PostDetail {...posts.results[0]} setPosts={setPosts} postPage />}
 				{/* {post && <PostDetail {...post} setPost={setPost} postPage/>} */}
 				<Container className={classes.content}>Comments</Container>

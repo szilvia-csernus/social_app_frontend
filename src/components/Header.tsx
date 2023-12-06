@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, redirect } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -8,31 +8,31 @@ import myLogo from '../assets/logo.svg';
 import classes from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
-	CurrentUserContext,
+	RefreshKeyDispatchContext,
 	// RefreshKeyContext,
-	type UserContextType,
-	SetAccessKeyContext,
-	SetRefreshKeyContext,
+	// SetAccessKeyContext,
+	// SetRefreshKeyContext,
 } from '../contexts/CurrentUserContext';
 import Avatar from './Avatar';
 import axios from 'axios';
 import useClickOutsideToggle from '../hooks/useClickOutsideToggle';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 function Header() {
-	const currentUser: UserContextType = useContext(CurrentUserContext);
-	const setAccessKey = useContext(SetAccessKeyContext);
-	const setRefreshKey = useContext(SetRefreshKeyContext);
+	const currentUser = useCurrentUser();
+	// const setAccessKey = useContext(SetAccessKeyContext);
+	const dispatch = useContext(RefreshKeyDispatchContext);
 
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
 
 	const HandleSignOut = async () => {
 		const response = await axios.post('dj-rest-auth/logout/');
 		if (response.status === 200) {
-			setAccessKey('');
-			setRefreshKey('');
-			localStorage.setItem('access', '');
-			localStorage.setItem('refresh', '');
-			console.log('both access and refresh keys been cleared from everywhere!!')
+			// setAccessKey('');
+			dispatch({ type: 'SET_REFRESH_KEY', payload: '' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!')
+			// redirect('/')
 		} else {
 			console.log('Logout unsuccessful', response);
 		}

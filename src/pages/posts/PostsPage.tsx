@@ -6,17 +6,16 @@ import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
 // import classes from './Post.module.css';
-import { axiosRes } from '../../api/axiosDefaults';
+// import { axiosRes } from '../../api/axiosDefaults';
 import { useLocation } from 'react-router-dom';
 import {
-	CurrentUserContext,
 	RefreshKeyContext,
-	SetAccessKeyContext,
 } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
 import PostDetail, { type PostType } from './PostDetail';
 import axios from 'axios';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 type PostsProps = {
 	message: string;
@@ -30,10 +29,10 @@ export type PostsType = {
 };
 
 const PostsPage: FC<PostsProps> = ({ message }) => {
-	const currentUser = useContext(CurrentUserContext);
-	const setAccessKey = useContext(SetAccessKeyContext);
+	const currentUser = useCurrentUser();
+	// const setAccessKey = useContext(SetAccessKeyContext);
 	const refreshKey = useContext(RefreshKeyContext);
-	// const profile_id = currentUser?.profile_id || '';
+	const profile_id = currentUser?.profile_id || '';
 
 	const [posts, setPosts] = useState<PostsType>({
 		count: 0,
@@ -42,32 +41,36 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 		results: [],
 	});
 	const [hasLoaded, setHasLoaded] = useState(false);
-	const [filter, setFilter] = useState('');
+	// const [filter, setFilter] = useState('');
 	const { pathname } = useLocation();
 
 	useEffect(() => {
 		console.log('useEffect() for set filtering in PostPage runs');
-		if (currentUser) {
-			switch (pathname) {
-				case '/feed':
-					setFilter(`owner__followed__owner__profile=${currentUser.profile_id}&`);
-					break;
-				case '/liked':
-					setFilter(
+		// if (currentUser) {
+			let filter: string;
+			if (currentUser) {
+
+				switch (pathname) {
+					case '/feed':
+						filter = `owner__followed__owner__profile=${currentUser.profile_id}&`;
+						break;
+					case '/liked':
+						filter = 
 						`likes__owner__profile=${currentUser.profile_id}&ordering=-likes__created_at&`
-					);
-					break;
+						;
+						break;
+				}
 			}
-		} else {
-			setFilter("");
-		}
-	}, [pathname, currentUser]);
+		// } else {
+		// 	setFilter("");
+		// }
+	// }, [pathname, currentUser]);
 
-	console.log(pathname);
-	console.log('filter', filter);
+	// console.log(pathname);
+	// console.log('filter', filter);
 
-	useEffect(() => {
-		console.log('useEffect() for fetching posts in PostsPage runs');
+	// useEffect(() => {
+		// console.log('useEffect() for fetching posts in PostsPage runs');
 		let postData;
 		const fetchPosts = async () => {
 			try {
@@ -75,36 +78,37 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 					refresh: refreshKey,
 				});
 				if (accessKeyData.data.access) {
-					setAccessKey(accessKeyData.data.access);
-					postData = await axiosRes.get(`/posts/?${filter}`, {
+					// setAccessKey(accessKeyData.data.access);
+					postData = await axios.get(`/posts/?${filter}`, {
 						headers: {
 							Authorization: `Bearer ${accessKeyData.data.access}`,
 						},
 					});
+					setPosts(postData.data);
 				} else {
-					postData = await axiosRes.get(`/posts/?${filter}`);
+					postData = await axios.get(`/posts/?${filter}`);
+					setPosts(postData.data);
 				}
 
-				setPosts(postData.data);
 				console.log('posts set to: ', postData.data);
 				setHasLoaded(true);
 			} catch (err) {
 				console.log(err);
-				postData = await axiosRes.get('/posts/');
-				setPosts(postData.data);
+				// postData = await axiosRes.get('/posts/');
+				// setPosts(postData.data);
 				setHasLoaded(true);
 			}
 		};
 
 		setHasLoaded(false);
 		fetchPosts();
-	}, [filter, refreshKey, setAccessKey]);
+	}, [refreshKey, pathname, currentUser]);
 
 	return (
 		<Row className="h-100">
 			<Col className="py-2 p-0 p-lg-2" lg={8}>
 				<p>Popular profiles mobile</p>
-				{hasLoaded ? (
+				{hasLoaded && (
 					<>
 						{posts.results.length ? (
 							posts.results.map((post) => (
@@ -122,7 +126,8 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 							</>
 						)}
 					</>
-				) : (
+				)}
+				{!hasLoaded && (
 					<Modal>
 						<Spinner />
 					</Modal>

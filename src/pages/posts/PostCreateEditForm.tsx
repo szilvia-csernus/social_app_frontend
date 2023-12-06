@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useContext, useRef, useState } from 'react';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -14,8 +14,10 @@ import btnClasses from '../../components/Button.module.css';
 import Asset from '../../components/Asset';
 import { Alert, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { axiosReq } from '../../api/axiosDefaults';
-import { type AxiosResponse } from 'axios';
+// import { axiosReq } from '../../api/axiosDefaults';
+import axios, { type AxiosResponse } from 'axios';
+import { RefreshKeyContext } from '../../contexts/CurrentUserContext';
+
 
 type PostData = {
 	title: string;
@@ -57,6 +59,7 @@ function PostCreateForm() {
 		content: '',
 		image: '',
 	});
+	const refreshKey = useContext(RefreshKeyContext);
 
 	const { title, content, image } = postData;
 
@@ -92,15 +95,23 @@ function PostCreateForm() {
 			formData.append('image', imageInput.current.files[0])
 		}
 
-		const accessKey = localStorage.getItem('access');
+		// const accessKey = localStorage.getItem('access');
 
 		try {
-			const { data } = await axiosReq.post('/posts/', formData, {
-				headers: {
-					Authorization: `Bearer ${accessKey}`,
-				},
-			});
-			navigate(`/posts/${data.id}`, { state: { from: location } });
+			const accessKeyData = await axios.post('api/token/refresh/', {
+					refresh: refreshKey,
+				});
+			if (accessKeyData.data.access) {
+				const { data } = await axios.post('/posts/', formData, {
+					headers: {
+						Authorization: `Bearer ${accessKeyData.data.access}`,
+					},
+				});
+				navigate(`/posts/${data.id}`, { state: { from: location } });
+			}
+			else {
+				// refresKey expired, do stg here
+			}
 		} catch (err) {
 			const axiosError = err as AxiosError;
 			console.log('axios error', axiosError)

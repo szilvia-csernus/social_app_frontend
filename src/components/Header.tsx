@@ -1,4 +1,4 @@
-import { Link, NavLink, redirect } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -8,28 +8,23 @@ import myLogo from '../assets/logo.svg';
 import classes from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
-	RefreshKeyDispatchContext,
-	// RefreshKeyContext,
-	// SetAccessKeyContext,
-	// SetRefreshKeyContext,
+	CurrentUserStateContext,
+	LogoutUserContext,
 } from '../contexts/CurrentUserContext';
 import Avatar from './Avatar';
 import axios from 'axios';
 import useClickOutsideToggle from '../hooks/useClickOutsideToggle';
-import { useCurrentUser } from '../hooks/useCurrentUser';
 
 function Header() {
-	const currentUser = useCurrentUser();
-	// const setAccessKey = useContext(SetAccessKeyContext);
-	const dispatch = useContext(RefreshKeyDispatchContext);
+	const currentUserState = useContext(CurrentUserStateContext);
+	const dispatch = useContext(LogoutUserContext)
 
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
 
 	const HandleSignOut = async () => {
 		const response = await axios.post('dj-rest-auth/logout/');
 		if (response.status === 200) {
-			// setAccessKey('');
-			dispatch({ type: 'SET_REFRESH_KEY', payload: '' });
+			dispatch({type: 'LOG_OUT'});
 			localStorage.removeItem('refresh');
 			console.log('refresh key has been cleared from everywhere!!')
 			// redirect('/')
@@ -53,11 +48,11 @@ function Header() {
 				<i className="fas fa-sign-out-alt"></i> Logout
 			</Link>
 			<NavLink
-				to={`/profiles/${currentUser?.profile_id}`}
+				to={`/profiles/${currentUserState.user?.profile_id}`}
 				className={classes.myNavLink}
 			>
-				{currentUser && (
-					<Avatar src={currentUser.profile_image} text="" height={40} />
+				{currentUserState.user && (
+					<Avatar src={currentUserState.user.profile_image} text="" height={40} />
 				)}
 			</NavLink>
 		</>
@@ -92,7 +87,7 @@ function Header() {
 					aria-controls="basic-navbar-nav"
 				/>
 				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-					<Nav>{currentUser ? loggedInIcons : loggedOutIcons}</Nav>
+					<Nav>{currentUserState.user ? loggedInIcons : loggedOutIcons}</Nav>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

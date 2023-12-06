@@ -9,7 +9,7 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 // import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetRefreshKeyContext, SetCurrentUserContext, RefreshKeyDispatchContext } from '../contexts/CurrentUserContext';
+import { SetUserWithRefreshKeyContext } from '../contexts/CurrentUserContext';
 // import { axiosRes } from '../api/axiosDefaults';
 
 type logInDataType = {
@@ -34,9 +34,7 @@ type ErrorResponse = {
 };
 
 const LogInForm = () => {
-	// const setAccessKey = useContext(SetAccessKeyContext);
-	const dispatch = useContext(RefreshKeyDispatchContext);
-	// const setCurrentUser = useContext(SetCurrentUserContext);
+	const setUserWithRefreshKey = useContext(SetUserWithRefreshKeyContext)
 
 	const [logInData, setLogInData] = useState<logInDataType>({
 		username: '',
@@ -66,15 +64,9 @@ const LogInForm = () => {
 			const loginData = await axios.post('dj-rest-auth/login/', logInData)
 			if (loginData.status === 200) {
 				const loginData = await axios.post('api/token/', logInData);
-				// setAccessKey(loginData.data.access);
-				dispatch({ type: 'SET_REFRESH_KEY', payload: loginData.data.refresh });
+				setUserWithRefreshKey(loginData.data.refresh);
 				localStorage.setItem('refresh', loginData.data.refresh);
 				console.log('refresh token set in localstorage', loginData);
-				// const { data } = await axiosRes.get('dj-rest-auth/user', {
-				// 	headers: {
-				// 		Authorization: `Bearer ${loginData.data.access}`,
-				// 	},
-				// });
 				
 				// navigate('/feed');
 			}

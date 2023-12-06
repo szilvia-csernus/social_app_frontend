@@ -95,8 +95,6 @@ function PostCreateForm() {
 			formData.append('image', imageInput.current.files[0])
 		}
 
-		// const accessKey = localStorage.getItem('access');
-
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
 					refresh: refreshKey,

@@ -9,13 +9,12 @@ import Row from 'react-bootstrap/Row';
 // import { axiosRes } from '../../api/axiosDefaults';
 import { useLocation } from 'react-router-dom';
 import {
-	RefreshKeyContext,
+	CurrentUserStateContext,
 } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
 import PostDetail, { type PostType } from './PostDetail';
 import axios from 'axios';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 type PostsProps = {
 	message: string;
@@ -29,10 +28,7 @@ export type PostsType = {
 };
 
 const PostsPage: FC<PostsProps> = ({ message }) => {
-	const currentUser = useCurrentUser();
-	// const setAccessKey = useContext(SetAccessKeyContext);
-	const refreshKey = useContext(RefreshKeyContext);
-	const profile_id = currentUser?.profile_id || '';
+	const currentUserState = useContext(CurrentUserStateContext);
 
 	const [posts, setPosts] = useState<PostsType>({
 		count: 0,
@@ -46,63 +42,57 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 
 	useEffect(() => {
 		console.log('useEffect() for set filtering in PostPage runs');
-		// if (currentUser) {
-			let filter: string;
-			if (currentUser) {
 
-				switch (pathname) {
-					case '/feed':
-						filter = `owner__followed__owner__profile=${currentUser.profile_id}&`;
-						break;
-					case '/liked':
-						filter = 
-						`likes__owner__profile=${currentUser.profile_id}&ordering=-likes__created_at&`
-						;
-						break;
-				}
+		let filter: string;
+		if (currentUserState && currentUserState.user) {
+			console.log('currentUserState: ', currentUserState);
+			console.log('pathname: ', pathname);
+			switch (pathname) {
+				case '/feed':
+					filter = `owner__followed__owner__profile=${currentUserState.user.profile_id}&`;
+					break;
+				case '/liked':
+					filter = `likes__owner__profile=${currentUserState.user.profile_id}&ordering=-likes__created_at&`;
+					break;
 			}
-		// } else {
-		// 	setFilter("");
-		// }
-	// }, [pathname, currentUser]);
+		} else {
+			filter = '';
+		}
 
-	// console.log(pathname);
-	// console.log('filter', filter);
-
-	// useEffect(() => {
-		// console.log('useEffect() for fetching posts in PostsPage runs');
 		let postData;
 		const fetchPosts = async () => {
 			try {
 				const accessKeyData = await axios.post('api/token/refresh/', {
-					refresh: refreshKey,
+					refresh: currentUserState.refresh,
 				});
-				if (accessKeyData.data.access) {
-					// setAccessKey(accessKeyData.data.access);
+				if (accessKeyData.data.access && filter) {
 					postData = await axios.get(`/posts/?${filter}`, {
 						headers: {
 							Authorization: `Bearer ${accessKeyData.data.access}`,
 						},
 					});
 					setPosts(postData.data);
+					console.log('posts set to: ', postData.data);
 				} else {
-					postData = await axios.get(`/posts/?${filter}`);
+					postData = await axios.get(`/posts/`);
 					setPosts(postData.data);
+					console.log('posts set to: ', postData.data);
 				}
 
-				console.log('posts set to: ', postData.data);
 				setHasLoaded(true);
 			} catch (err) {
 				console.log(err);
-				// postData = await axiosRes.get('/posts/');
-				// setPosts(postData.data);
+				postData = await axios.get(`/posts/`);
+				setPosts(postData.data);
+				console.log('posts set to: ', postData.data);
+				
 				setHasLoaded(true);
 			}
 		};
 
 		setHasLoaded(false);
 		fetchPosts();
-	}, [refreshKey, pathname, currentUser]);
+	}, [currentUserState, pathname]);
 
 	return (
 		<Row className="h-100">

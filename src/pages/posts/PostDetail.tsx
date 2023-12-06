@@ -1,13 +1,12 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import classes from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { RefreshKeyContext } from '../../contexts/CurrentUserContext';
+import { CurrentUserStateContext, RefreshKeyContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { type PostsType } from './PostsPage';
 import axios from 'axios';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 export type PostType = {
 	id: string;
@@ -44,17 +43,22 @@ const PostDetail: FC<PostDetailProps> = ({
 	postPage,
 }) => {
     
-	const currentUser = useCurrentUser();
+	const currentUser = useContext(CurrentUserStateContext)
 	const refreshKey = useContext(RefreshKeyContext);
-	// const setAccessKey = useContext(SetAccessKeyContext)
-	const isPostOwner = currentUser ? currentUser.username === owner : false;
+	const [isPostOwner, setIsPostOwner] = useState<boolean>(false);
+
+	useEffect(() => {
+		const postOwner = currentUser.user
+			? currentUser.user.username === owner
+			: false;
+		setIsPostOwner(postOwner)
+	}, [currentUser, owner])
 
 	const handleLike = async () => {
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
 				refresh: refreshKey,
 			});
-			// setAccessKey(accessKeyData.data.access);
 			const { data } = await axios.post(
 				'/likes/',
 				{ post: id },
@@ -92,7 +96,6 @@ const PostDetail: FC<PostDetailProps> = ({
 			const accessKeyData = await axios.post('api/token/refresh/', {
 				refresh: refreshKey,
 			});
-			// setAccessKey(accessKeyData.data.access);
 			await axios.delete(`/likes/${like_id}`, {
 				headers: {
 					Authorization: `Bearer ${accessKeyData.data.access}`,
@@ -156,7 +159,7 @@ const PostDetail: FC<PostDetailProps> = ({
 							<span onClick={handleUnLike}>
 								<i className={`fas fa-heart ${classes.heart}`} />
 							</span>
-						) : currentUser ? (
+						) : currentUser.user ? (
 							<span onClick={handleLike}>
 								<i className={`far fa-heart ${classes.heartOutline}`} />
 							</span>

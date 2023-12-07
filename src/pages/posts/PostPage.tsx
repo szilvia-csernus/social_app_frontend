@@ -2,7 +2,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 
-import classes from './Post.module.css';
+import styles from './Post.module.css';
 import { useParams } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
 // import { axiosReq } from '../../api/axiosDefaults';
@@ -56,7 +56,7 @@ const PostPage: FC = () => {
 				{/* postPage will evaluate as truthy inside this PostPage component! */}
 				{<PostDetail {...posts.results[0]} setPosts={setPosts} postPage />}
 				{/* {post && <PostDetail {...post} setPost={setPost} postPage/>} */}
-				<Container className={classes.content}>Comments</Container>
+				<Container className={styles.Content}>Comments</Container>
 			</Col>
 			<Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
 				Popular profiles for desktop

@@ -1,4 +1,4 @@
-.post {
+.Post {
     display: flex;
     border: 1px solid #dadadf;
     border-radius: 2px;
@@ -7,52 +7,52 @@
 
 }
 
-.post figure, h5 {
+.Post figure, h5 {
     margin: 0;
 }
 
-.heart {
+.Heart {
     color: red;
 }
 
-.heart:hover {
+.Heart:hover {
     color: rgb(54, 54, 168);
 }
 
-.heartOutline:hover {
+.HeartOutline:hover {
     color: rgb(254, 116, 116);
 }
 
-.container {
+.Container {
   min-height: 343px;
 }
 
-.content {
+.Content {
   background-color: var(--bs-body-bg);
   padding: 1rem;
 }
 
-.image {
+.Image {
   max-height: 40vh;
   max-width: 100%;
   object-fit: contain;
 }
 
-.searchBar input {
+.SearchBar input {
     border-radius: 20px;
     color: #242a3d;
     padding-left: 40px;
     margin-bottom: 16px;
   }
   
-  .searchIcon {
-    position: absolute;
-    font-size: 1.2rem;
-    padding: 9px;
-    padding-left: 15px;
-  }
-  
-  .searchIcon:hover {
-    cursor: default;
-    color: #cfced3;
-  }
+.SearchIcon {
+  position: absolute;
+  font-size: 1.2rem;
+  padding: 9px;
+  padding-left: 15px;
+}
+
+.SearchIcon:hover {
+  cursor: default;
+  color: #cfced3;
+}

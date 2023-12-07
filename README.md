@@ -25,19 +25,27 @@ If you are developing a production application, we recommend updating the config
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
-# social_app_frontend
+# Moments Frontend
 
 ## Packages
 
-`react-bootstrap bootstrap`
+* `react-bootstrap` & `bootstrap`
+* `axios`
+* `react-router-dom v6`
+* `serve` - for hosting on Heroku
+
 
 # Credits
 
-Logo: https://www.svgrepo.com/svg/489904/connect
-Upload icon: https://www.svgrepo.com/svg/530396/upload
-No results icon: https://www.svgrepo.com/svg/530386/magnifying-glass-find-search
-Background color: https://cssgradient.io/swatches/
-Illustrations: https://undraw.co/
+* Styles, style elements: Code Institute
+* Code Institute provided the basic structure for the app. However, I made several fundamental changes that made the code completely different. The changes that I implemented are as follows. 
+   - I added TypeScript, 
+   - used @vite instead of react-create-app for setup,
+   - react-router-dom v6 instead of v5 for routing (v6 has fundamental changes to v5)
+   - Bootstrap 5 instead of 4 for styles
+   - as my backend API uses django v4 instead of v3 and used newer versions for django-restframework as well as djangorestframework-simplejwt too, my API endpoints are different.
+   - I used a completely different approach for authentication, login & logout.
+   - I managed state values with reducers whenever it was necessary to avoid unneccessary re-renders instead of using several useState() values.
 
-Converting svg to png for favicon: https://svgtopng.com/
+Converting svg to png: https://svgtopng.com/
 Favicon generator: https://realfavicongenerator.net/

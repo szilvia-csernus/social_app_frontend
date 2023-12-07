@@ -3,9 +3,9 @@ import { Link, NavLink } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import myLogo from '../assets/logo.svg';
+import myLogo from '../assets/logo.png';
 
-import classes from './Header.module.css';
+import styles from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
 	CurrentUserStateContext,
@@ -27,7 +27,6 @@ function Header() {
 			dispatch({type: 'LOG_OUT'});
 			localStorage.removeItem('refresh');
 			console.log('refresh key has been cleared from everywhere!!')
-			// redirect('/')
 		} else {
 			console.log('Logout unsuccessful', response);
 		}
@@ -35,51 +34,64 @@ function Header() {
 
 	const loggedInIcons: ReactNode = (
 		<>
-			<NavLink to="/posts/create" className={classes.myNavLink}>
-				<i className="far fa-plus-square"></i> Post
+			
+			<NavLink to="/" className={styles.NavLink}>
+				<i className="fas fa-home"></i> Home
 			</NavLink>
-			<NavLink to="/feed" className={classes.myNavLink}>
+			<NavLink to="/feed" className={styles.NavLink}>
 				<i className="fas fa-stream"></i> Feed
 			</NavLink>
-			<NavLink to="/liked" className={classes.myNavLink}>
+			<NavLink to="/liked" className={styles.NavLink}>
 				<i className="fas fa-heart"></i> Liked
 			</NavLink>
-			<Link to="/" className={classes.myNavLink} onClick={HandleSignOut}>
+			<Link to="/" className={styles.NavLink} onClick={HandleSignOut}>
 				<i className="fas fa-sign-out-alt"></i> Logout
 			</Link>
 			<NavLink
 				to={`/profiles/${currentUserState.user?.profile_id}`}
-				className={classes.myNavLink}
+				className={styles.NavLink}
 			>
 				{currentUserState.user && (
-					<Avatar src={currentUserState.user.profile_image} text="" height={40} />
+					<Avatar
+						src={currentUserState.user.profile_image}
+						text=""
+						height={40}
+					/>
 				)}
 			</NavLink>
 		</>
 	);
 	const loggedOutIcons = (
 		<>
-			<NavLink to="/login" className={classes.myNavLink}>
-				<i className="fa-solid fa-right-to-bracket"></i> Log in
+			<NavLink to="/signin" className={styles.NavLink}>
+				<i className="fas fa-sign-in-alt"></i> Sign in
 			</NavLink>
-			<NavLink to="/register" className={classes.myNavLink}>
-				<i className="fa-solid fa-circle-user"></i> Register
+			<NavLink to="/signup" className={styles.NavLink}>
+				<i className="fas fa-user-plus"></i> Sign Up
 			</NavLink>
 		</>
 	);
 	return (
-		<Navbar expanded={expanded} expand="md" className="bg-body-tertiary">
+		<Navbar
+			expanded={expanded}
+			expand="md"
+			fixed="top"
+			className={`bg-body-tertiary ${styles.NavBar}`}
+		>
 			<Container>
-				<Navbar.Brand>
-					<Link to="/" className={classes.myNavLink}>
+				<Navbar.Brand className="d-flex align-center">
+					<Link to="/" className={styles.NavLink}>
 						<img
 							src={myLogo}
-							width="60"
-							height="60"
+							width="50"
+							height="40"
 							className="d-inline-block align-top"
 							alt="connect logo"
 						/>
 					</Link>
+					<NavLink to="/posts/create" className={styles.NavLink}>
+						<i className="far fa-plus-square"></i> Post
+					</NavLink>
 				</Navbar.Brand>
 				<Navbar.Toggle
 					onClick={() => setExpanded(!expanded)}

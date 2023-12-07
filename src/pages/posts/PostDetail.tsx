@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import classes from './Post.module.css';
+import styles from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
 import { CurrentUserStateContext, RefreshKeyContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -124,7 +124,7 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	return (
 		<>
-			<Card className={classes.post}>
+			<Card className={styles.Post}>
 				<Card.Body>
 					<div className="d-flex align-items-center justify-content-between">
 						<Link to={`/profiles/${profile_id}`} className="d-flex gap-2">
@@ -146,7 +146,7 @@ const PostDetail: FC<PostDetailProps> = ({
 					)}
 					{content && <Card.Text>{content}</Card.Text>}
 					<div
-						className={`${classes.postBar} d-flex gap-2 justify-content-center`}
+						className={`${styles.PostBar} d-flex gap-2 justify-content-center`}
 					>
 						{isPostOwner ? (
 							<OverlayTrigger
@@ -157,11 +157,11 @@ const PostDetail: FC<PostDetailProps> = ({
 							</OverlayTrigger>
 						) : like_id ? (
 							<span onClick={handleUnLike}>
-								<i className={`fas fa-heart ${classes.heart}`} />
+								<i className={`fas fa-heart ${styles.Heart}`} />
 							</span>
 						) : currentUser.user ? (
 							<span onClick={handleLike}>
-								<i className={`far fa-heart ${classes.heartOutline}`} />
+								<i className={`far fa-heart ${styles.HeartOutline}`} />
 							</span>
 						) : (
 							<OverlayTrigger

@@ -11,7 +11,7 @@ function App() {
 	return (
 		<Container>
 			<Header />
-			<Container>
+			<Container className="Main">
 				<Outlet />
 			</Container>
 		</Container>

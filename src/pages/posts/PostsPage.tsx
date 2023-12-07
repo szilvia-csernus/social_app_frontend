@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
-// import classes from './Post.module.css';
+// import styles from './Post.module.css';
 // import { axiosRes } from '../../api/axiosDefaults';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {

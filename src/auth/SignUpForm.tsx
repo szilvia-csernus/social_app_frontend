@@ -1,16 +1,15 @@
-import classes from './Auth.module.css';
-import btnClasses from '../components/Button.module.css'
+import styles from './Auth.module.css';
+import btnStyles from '../components/Button.module.css'
 
-import { Col, Row, Form, Button, Alert } from 'react-bootstrap';
-import Card from 'react-bootstrap/Card';
-import illustration from '../assets/register.svg';
+import { Col, Row, Form, Button, Alert, Image, Container } from 'react-bootstrap';
+import illustration from '../assets/signup.jpg';
 
 import { type ChangeEvent, useState, FormEvent } from 'react';
 import axios, { AxiosError } from 'axios';
 // import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-type registerDataType = {
+type SignUpDataType = {
 	username: string,
 	password1: string,
 	password2: string
@@ -33,8 +32,8 @@ type ErrorResponse = {
 };
 
 
-const RegisterForm = () => {
-	const [registerData, setRegisterData] = useState<registerDataType>({
+const SignUpForm = () => {
+	const [signUpData, setSignUpData] = useState<SignUpDataType>({
 		username: '',
 		password1: '',
 		password2: ''
@@ -42,13 +41,13 @@ const RegisterForm = () => {
 
 	const [errors, setErrors] = useState<errorDataType>();
 
-	const {username, password1, password2 } = registerData;
+	const {username, password1, password2 } = signUpData;
 
 	// const navigate = useNavigate();
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const {name, value} = event.target;
-		setRegisterData((prevData) => {
+		setSignUpData((prevData) => {
 			return {
 				...prevData,
 				[name]: value,
@@ -60,7 +59,7 @@ const RegisterForm = () => {
 		event.preventDefault();
 
 		try {
-			await axios.post('dj-rest-auth/registration/', registerData, {
+			await axios.post('dj-rest-auth/registration/', signUpData, {
 				headers: {
 					"Content-Type": 'multipsrt/form-data',
 				}
@@ -84,19 +83,16 @@ const RegisterForm = () => {
 	};
 
 	return (
-		<Row className="py-5">
-			<Col className="my-auto py-2 px-0" md={6}>
-				<Card className={`p-4 ${classes.authCard}`}>
-					<Card.Body>
-						<div>
-							<h1 className={`pb-3 ${classes.authHeader}`}>register</h1>
-						</div>
+		<Row className={styles.Row}>
+			<Col className={`my-auto py-2 p-md-2`} md={6}>
+				<Container className="Content p-4">
+							<h1 className={`pb-3 ${styles.Header}`}>Sign Up</h1>
 
 						<Form onSubmit={handleSubmit}>
 							<Form.Group className="mb-3" controlId="username">
 								<Form.Label className="d-none">Username/email</Form.Label>
 								<Form.Control
-									className={classes.authInput}
+									className={styles.Input}
 									type="username"
 									placeholder="Enter username"
 									name="username"
@@ -115,7 +111,7 @@ const RegisterForm = () => {
 							<Form.Group className="mb-3" controlId="password1">
 								<Form.Label className="d-none">Password</Form.Label>
 								<Form.Control
-									className={classes.authInput}
+									className={styles.Input}
 									type="password"
 									placeholder="Password"
 									name="password1"
@@ -134,7 +130,7 @@ const RegisterForm = () => {
 							<Form.Group className="mb-3" controlId="password2">
 								<Form.Label className="d-none">Password (again)</Form.Label>
 								<Form.Control
-									className={classes.authInput}
+									className={styles.Input}
 									type="password"
 									placeholder="Password (again)"
 									name="password2"
@@ -152,10 +148,10 @@ const RegisterForm = () => {
 								))}
 
 							<Button
-								className={`${btnClasses.button} ${btnClasses.wide}`}
+								className={`${btnStyles.Button} ${btnStyles.Wide} ${btnStyles.Bright}`}
 								type="submit"
 							>
-								Register
+								Sign Up
 							</Button>
 							{errors &&
 								errors.non_field_errors.map((data, idx) => (
@@ -164,25 +160,27 @@ const RegisterForm = () => {
 									</Alert>
 								))}
 						</Form>
-						<div>
-							Already have an account?
-							<Link className={classes.authLink} to="/login">
-								<span>Log in</span>
-							</Link>
-						</div>
-					</Card.Body>
-				</Card>
+
+					<div className="mt-3">
+						<Link className={styles.Link} to="/singin">
+						Already have an account?
+							<span>Log in</span>
+						</Link>
+					</div>
+				</Container>
 			</Col>
-			<Col md={6} className="my-auto mx-auto d-none d-md-block">
-				<img
+			<Col
+				md={6}
+				className={`my-auto d-none d-md-block p-2 ${styles.SignUpCol}`}
+			>
+				<Image
+					className="FillerImage"
 					src={illustration}
-					width="300"
-					height="300"
-					alt="register illustration"
+					alt="sign up illustration"
 				/>
 			</Col>
 		</Row>
 	);
 }
 
-export default RegisterForm;
+export default SignUpForm;

@@ -4,8 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/Error.tsx';
-import RegisterForm from './auth/RegisterForm.tsx';
-import LogInForm from './auth/LogInForm.tsx';
+import SignUpForm from './auth/SignUpForm.tsx';
+import SignInForm from './auth/SignInForm.tsx';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
 // import React from 'react';
 import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
@@ -13,6 +13,7 @@ import PostPage from './pages/posts/PostPage.tsx';
 import PostsPage from './pages/posts/PostsPage.tsx';
 import Modal from './components/Modal.tsx';
 import Spinner from './components/Spinner.tsx';
+
 
 const router = createBrowserRouter([
 	{
@@ -38,8 +39,8 @@ const router = createBrowserRouter([
 					<PostsPage message="No results found. Adjust the search keyword or follow a user." />
 				),
 			},
-			{ path: 'login', element: <LogInForm /> },
-			{ path: 'register', element: <RegisterForm /> },
+			{ path: 'signin', element: <SignInForm /> },
+			{ path: 'signup', element: <SignUpForm /> },
 			{ path: 'posts/create', element: <PostCreateEditForm /> },
 			{
 				path: 'posts/:id',

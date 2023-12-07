@@ -6,11 +6,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 
-import Upload from '../../assets/upload.svg';
+import Upload from '../../assets/upload.png';
 
-import classes from './Post.module.css';
+import styles from './Post.module.css';
 
-import btnClasses from '../../components/Button.module.css';
+import btnStyles from '../../components/Button.module.css';
 import Asset from '../../components/Asset';
 import { Alert, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -102,6 +102,7 @@ function PostCreateForm() {
 			if (accessKeyData.data.access) {
 				const { data } = await axios.post('/posts/', formData, {
 					headers: {
+						'Content-Type': 'multipart/form-data',
 						Authorization: `Bearer ${accessKeyData.data.access}`,
 					},
 				});
@@ -131,10 +132,10 @@ function PostCreateForm() {
 
 	const textFields = (
 		<div className="text-center">
-			<Form.Group className="">
+			<Form.Group className="mb-2">
 				<Form.Label className="">Title</Form.Label>
 				<Form.Control
-					className={classes.title}
+					className={styles.title}
 					type="text"
 					name="title"
 					value={title}
@@ -147,10 +148,10 @@ function PostCreateForm() {
 						{data}
 					</Alert>
 				))}
-			<Form.Group className="">
+			<Form.Group className="mb-2">
 				<Form.Label className="">Content</Form.Label>
 				<Form.Control
-					className={classes.content}
+					className={styles.content}
 					as="textarea"
 					name="content"
 					rows={6}
@@ -164,10 +165,15 @@ function PostCreateForm() {
 						{data}
 					</Alert>
 				))}
-			<Button className={`${btnClasses.button}`} onClick={handleCancel}>
+			<Button
+				className={`${btnStyles.Button} ${btnStyles.Blue}`}
+				onClick={handleCancel}
+			>
 				cancel
 			</Button>
-			<Button className={`${btnClasses.button}`} type="submit">
+			<Button
+				className={`${btnStyles.Button} ${btnStyles.Blue}`}
+				type="submit">
 				create
 			</Button>
 		</div>
@@ -175,20 +181,23 @@ function PostCreateForm() {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Row className="justify-content-between">
-				<Col className="py-2 p-0" md={6} lg={8}>
+			<Row>
+				<Col className="py-2 p-0 p-md-2" md={6} lg={8}>
 					<Container
-						className={`${classes.content} ${classes.container} d-flex flex-column justify-content-center`}
+						className={`Content ${styles.container} d-flex flex-column justify-content-center`}
 					>
 						<Form.Group className="text-center">
 							{image ? (
 								<>
 									<figure>
-										<Image className={classes.image} src={image} rounded />
+										<Image
+											src={image}
+											className="Image"
+											rounded />
 									</figure>
 									<div>
 										<Form.Label
-											className={btnClasses.button}
+											className={`${btnStyles.Button} ${btnStyles.Blue} btn`}
 											htmlFor="image-upload"
 										>
 											Change the image
@@ -225,7 +234,7 @@ function PostCreateForm() {
 					</Container>
 				</Col>
 				<Col md={5} lg={4} className="d-none d-md-block p-0 my-2">
-					<Container className={classes.content}>{textFields}</Container>
+					<Container className="Content">{textFields}</Container>
 				</Col>
 			</Row>
 		</Form>

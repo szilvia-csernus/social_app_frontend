@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 
 // import classes from './Post.module.css';
 // import { axiosRes } from '../../api/axiosDefaults';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
 	CurrentUserStateContext,
 } from '../../contexts/CurrentUserContext';
@@ -29,6 +29,8 @@ export type PostsType = {
 
 const PostsPage: FC<PostsProps> = ({ message }) => {
 	const currentUserState = useContext(CurrentUserStateContext);
+
+	const navigate = useNavigate();
 
 	const [posts, setPosts] = useState<PostsType>({
 		count: 0,
@@ -82,17 +84,21 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 				setHasLoaded(true);
 			} catch (err) {
 				console.log(err);
-				postData = await axios.get(`/posts/`);
-				setPosts(postData.data);
-				console.log('posts set to: ', postData.data);
+				if (currentUserState.user) {
+					navigate('/login')
+				} else {
+					postData = await axios.get(`/posts/`);
+					setPosts(postData.data);
+					console.log('posts set to: ', postData.data);
+					setHasLoaded(true);
+				}
 				
-				setHasLoaded(true);
 			}
 		};
 
 		setHasLoaded(false);
 		fetchPosts();
-	}, [currentUserState, pathname]);
+	}, [currentUserState, pathname, navigate]);
 
 	return (
 		<Row className="h-100">

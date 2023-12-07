@@ -17,7 +17,6 @@ export type UserContextType = {
 type UserReducerStateType = {
 	user: UserContextType;
 	refresh: string;
-	isLoggedIn: boolean;
 };
 
 type CurrentUserProviderProps = {
@@ -26,14 +25,13 @@ type CurrentUserProviderProps = {
 
 type Action =
 	| {type: 'LOG_IN'; payload: {user: UserContextType, refresh: string};}
-	| { type: 'LOG_OUT'; payload?: undefined };
+	| { type: 'LOG_OUT' };
 
 const initialRefreshKey = localStorage.getItem('refresh') || '';
 
 const initialCurrentUserState: UserReducerStateType = {
 	user: null,
 	refresh: initialRefreshKey,
-	isLoggedIn: false,
 };
 
 export const CurrentUserStateContext = createContext<UserReducerStateType>(initialCurrentUserState);
@@ -52,13 +50,11 @@ function currentUserReducer(
 			return {
 				user: action.payload.user,
 				refresh: action.payload.refresh,
-				isLoggedIn: true
 			};
 		case 'LOG_OUT':
 			return {
 				user: null,
 				refresh: '',
-				isLoggedIn: false,
 			}
 		default:
 			return state;

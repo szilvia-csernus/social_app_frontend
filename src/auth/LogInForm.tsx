@@ -7,7 +7,7 @@ import illustration from '../assets/login.svg';
 
 import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { SetUserWithRefreshKeyContext } from '../contexts/CurrentUserContext';
 // import { axiosRes } from '../api/axiosDefaults';
@@ -45,7 +45,7 @@ const LogInForm = () => {
 
 	const { username, password } = logInData;
 
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = event.target;
@@ -68,7 +68,7 @@ const LogInForm = () => {
 				localStorage.setItem('refresh', loginData.data.refresh);
 				console.log('refresh token set in localstorage', loginData);
 				
-				// navigate('/feed');
+				navigate('/feed');
 			}
 		} catch (error) {
 			console.log(error);

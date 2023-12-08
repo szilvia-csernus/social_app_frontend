@@ -37,16 +37,16 @@ function Header() {
 		<>
 			
 			<NavLink to="/" className={styles.NavLink}>
-				<i className="fas fa-home"></i> Home
+				<i className="fas fa-home"></i>Home
 			</NavLink>
 			<NavLink to="/feed" className={styles.NavLink}>
-				<i className="fas fa-stream"></i> Feed
+				<i className="fas fa-stream"></i>Feed
 			</NavLink>
 			<NavLink to="/liked" className={styles.NavLink}>
-				<i className="fas fa-heart"></i> Liked
+				<i className="fas fa-heart"></i>Liked
 			</NavLink>
 			<Link to="/" className={styles.NavLink} onClick={HandleSignOut}>
-				<i className="fas fa-sign-out-alt"></i> Logout
+				<i className="fas fa-sign-out-alt"></i>Logout
 			</Link>
 			<NavLink
 				to={`/profiles/${currentUser?.profile_id}`}
@@ -65,10 +65,10 @@ function Header() {
 	const loggedOutIcons = (
 		<>
 			<NavLink to="/signin" className={styles.NavLink}>
-				<i className="fas fa-sign-in-alt"></i> Sign in
+				<i className="fas fa-sign-in-alt"></i>Sign in
 			</NavLink>
 			<NavLink to="/signup" className={styles.NavLink}>
-				<i className="fas fa-user-plus"></i> Sign Up
+				<i className="fas fa-user-plus"></i>Sign Up
 			</NavLink>
 		</>
 	);
@@ -91,7 +91,7 @@ function Header() {
 						/>
 					</Link>
 					<NavLink to="/posts/create" className={styles.NavLink}>
-						<i className="far fa-plus-square"></i> Post
+						<i className="far fa-plus-square"></i>Post
 					</NavLink>
 				</Navbar.Brand>
 				<Navbar.Toggle

@@ -36,7 +36,7 @@ const router = createBrowserRouter([
 			{
 				path: 'liked',
 				element: (
-					<PostsPage message="No results found. Adjust the search keyword or follow a user." />
+					<PostsPage message="No results found. Adjust the search keyword or like a post." />
 				),
 			},
 			{ path: 'signin', element: <SignInForm /> },

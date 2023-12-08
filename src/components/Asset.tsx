@@ -1,15 +1,15 @@
 import { Spinner } from "react-bootstrap";
-import classes from "./Asset.module.css";
+import styles from "./Asset.module.css";
 
 type AssetProps = {
-    spinner: boolean;
-    src: string;
-    message: string
+    spinner?: boolean;
+    src?: string;
+    message?: string
 }
 
 const Asset = ({ spinner=false, src, message}: AssetProps) => {
   return (
-    <div className={`${classes.asset} p-4`}>
+    <div className={`${styles.Asset} p-4`}>
         {spinner && <Spinner animation="border" />}
         {src && <img src={src} alt={message} width={80} height={80}/>}
         {message && <p className="mt-4">{message}</p>}

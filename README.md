@@ -37,15 +37,16 @@ If you are developing a production application, we recommend updating the config
 
 # Credits
 
-* Styles, style elements: Code Institute
-* Code Institute provided the basic structure for the app. However, I made several fundamental changes that made the code completely different. The changes that I implemented are as follows. 
+* Design and styles: Code Institute
+* Code Institute provided the basic structure for the app. However, I implemented several fundamental changes with the end result of a completely different code. The changes I made are as follows:
    - I added TypeScript, 
    - used @vite instead of react-create-app for setup,
-   - react-router-dom v6 instead of v5 for routing (v6 has fundamental changes to v5)
-   - Bootstrap 5 instead of 4 for styles
+   - react-router-dom v6 instead of v5 for routing (v6 was a major upgrade)
    - as my backend API uses django v4 instead of v3 and used newer versions for django-restframework as well as djangorestframework-simplejwt too, my API endpoints are different.
    - I used a completely different approach for authentication, login & logout.
    - I managed state values with reducers whenever it was necessary to avoid unneccessary re-renders instead of using several useState() values.
+   - used Bootstrap 5 instead of 4 for styles
 
-Converting svg to png: https://svgtopng.com/
-Favicon generator: https://realfavicongenerator.net/
+
+* Favicon generator: https://realfavicongenerator.net/
+* Converting svg to png: https://svgtopng.com/

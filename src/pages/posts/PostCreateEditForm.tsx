@@ -14,9 +14,8 @@ import btnStyles from '../../components/Button.module.css';
 import Asset from '../../components/Asset';
 import { Alert, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-// import { axiosReq } from '../../api/axiosDefaults';
-import axios, { type AxiosResponse } from 'axios';
-import { RefreshKeyContext } from '../../contexts/CurrentUserContext';
+import { type AxiosResponse } from 'axios';
+import { AuthenticatedMultipartPostContext } from '../../contexts/CurrentUserContext';
 
 
 type PostData = {
@@ -59,7 +58,7 @@ function PostCreateForm() {
 		content: '',
 		image: '',
 	});
-	const refreshKey = useContext(RefreshKeyContext);
+	const authenticatedMultipartPost = useContext(AuthenticatedMultipartPostContext)
 
 	const { title, content, image } = postData;
 
@@ -96,20 +95,9 @@ function PostCreateForm() {
 		}
 
 		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-					refresh: refreshKey,
-				});
-			if (accessKeyData.data.access) {
-				const { data } = await axios.post('/posts/', formData, {
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				});
-				navigate(`/posts/${data.id}`, { state: { from: location } });
-			}
-			else {
-				// refresKey expired, do stg here
+			const response = await authenticatedMultipartPost('/posts/', formData);
+			if (response) {
+				navigate(`/posts/${response.data.id}`, { state: { from: location } });
 			}
 		} catch (err) {
 			const axiosError = err as AxiosError;

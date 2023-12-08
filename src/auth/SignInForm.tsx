@@ -8,10 +8,10 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { RefreshKeyContext, SetUserWithRefreshKeyContext } from '../contexts/CurrentUserContext';
+import { FetchTokensContext } from '../contexts/CurrentUserContext';
 // import { axiosRes } from '../api/axiosDefaults';
 
-type signinDataType = {
+export type signinDataType = {
 	username: string,
 	password: string
 };
@@ -33,8 +33,9 @@ type ErrorResponse = {
 };
 
 const SignInForm = () => {
-	const setUserWithRefreshKey = useContext(SetUserWithRefreshKeyContext)
-	const refreshKey = useContext(RefreshKeyContext)
+	// const setUserWithRefreshKey = useContext(SetUserWithRefreshKeyContext)
+	// const refreshKey = useContext(RefreshKeyContext)
+	const fetchAndSetTokens = useContext(FetchTokensContext)
 
 	const [signinData, setSigninData] = useState<signinDataType>({
 		username: '',
@@ -63,13 +64,7 @@ const SignInForm = () => {
 		try {
 			const signinDataResponse = await axios.post('dj-rest-auth/login/', signinData)
 			if (signinDataResponse.status === 200) {
-				const signinTokens = await axios.post('api/token/', signinData);
-				console.log('refreshKey before setting: ', refreshKey!.current)
-				refreshKey!.current = signinTokens.data.refresh;
-				console.log('refreshKey after setting: ', refreshKey!.current);
-				setUserWithRefreshKey();
-				localStorage.setItem('refresh', signinTokens.data.refresh);
-				console.log('refresh token set in localstorage', signinTokens.data.refresh);
+				fetchAndSetTokens(signinData);
 				
 				navigate('/feed');
 			}

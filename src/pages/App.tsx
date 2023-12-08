@@ -3,18 +3,21 @@ import '../api/axiosDefaults';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
 import { Outlet } from 'react-router-dom';
+import { CurrentUserProvider } from '../contexts/CurrentUserContext';
 
 
 function App() {
 	
 
 	return (
-		<Container>
-			<Header />
-			<Container className="Main">
-				<Outlet />
+		<CurrentUserProvider>
+			<Container>
+				<Header />
+				<Container className="Main">
+					<Outlet />
+				</Container>
 			</Container>
-		</Container>
+		</CurrentUserProvider>
 	);
 }
 

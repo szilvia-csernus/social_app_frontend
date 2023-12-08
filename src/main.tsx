@@ -6,7 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/Error.tsx';
 import SignUpForm from './auth/SignUpForm.tsx';
 import SignInForm from './auth/SignInForm.tsx';
-import { CurrentUserProvider } from './contexts/CurrentUserContext';
+// import { CurrentUserProvider } from './contexts/CurrentUserContext';
 // import React from 'react';
 import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
 import PostPage from './pages/posts/PostPage.tsx';
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	// <React.StrictMode>
-		<CurrentUserProvider>
+		
 			<RouterProvider
 				router={router}
 				fallbackElement={
@@ -62,6 +62,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					</Modal>
 				}
 			/>
-		</CurrentUserProvider>
 	// </React.StrictMode>
 );

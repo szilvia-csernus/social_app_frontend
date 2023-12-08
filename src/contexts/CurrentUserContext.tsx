@@ -1,6 +1,17 @@
-import React, { FC, MutableRefObject, ReactNode, createContext, useCallback, useMemo, useReducer, useRef } from 'react';
+import React, {
+	FC,
+	MutableRefObject,
+	ReactNode,
+	createContext,
+	useCallback,
+	useMemo,
+	useReducer,
+	useRef,
+} from 'react';
 import axios, { AxiosResponse } from 'axios';
 import ErrorBoundary from '../ErrorBoundary';
+import { useNavigate } from 'react-router';
+import { signinDataType } from '../auth/SignInForm';
 // import { redirect } from 'react-router-dom';
 
 export type UserContextType = {
@@ -15,16 +26,16 @@ export type UserContextType = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isUserContextType(obj: any): obj is UserContextType {
-  return (
-    obj &&
-    typeof obj.pk === 'number' &&
-    typeof obj.username === 'string' &&
-    typeof obj.email === 'string' &&
-    typeof obj.first_name === 'string' &&
-    typeof obj.last_name === 'string' &&
-    typeof obj.profile_id === 'number' &&
-    typeof obj.profile_image === 'string'
-  );
+	return (
+		obj &&
+		typeof obj.pk === 'number' &&
+		typeof obj.username === 'string' &&
+		typeof obj.email === 'string' &&
+		typeof obj.first_name === 'string' &&
+		typeof obj.last_name === 'string' &&
+		typeof obj.profile_id === 'number' &&
+		typeof obj.profile_image === 'string'
+	);
 }
 
 type CurrentUserProviderProps = {
@@ -32,8 +43,8 @@ type CurrentUserProviderProps = {
 };
 
 type Action =
-	| {type: 'LOG_IN'; payload: {user: UserContextType};}
-	| {type: 'LOG_OUT' }
+	| { type: 'LOG_IN'; payload: { user: UserContextType } }
+	| { type: 'LOG_OUT' };
 
 const initialRefreshKey = localStorage.getItem('refresh') || '';
 
@@ -41,11 +52,13 @@ const initialCurrentUser: UserContextType = null;
 
 type PostResponseData = {
 	id: number;
-}
+};
 
-export const CurrentUserContext = createContext<UserContextType>(initialCurrentUser);
-export const RefreshKeyContext = createContext<MutableRefObject<string> | null>(null);
-export const SetUserWithRefreshKeyContext = createContext<() => void>(() => {});
+export const CurrentUserContext =
+	createContext<UserContextType>(initialCurrentUser);
+export const FetchTokensContext = createContext<
+	(signinData: signinDataType) => void
+>(() => null);
 export const AuthenticatedFetchContext = createContext<
 	(path: string) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
@@ -55,7 +68,12 @@ export const AuthenticatedPostContext = createContext<
 export const AuthenticatedDeleteContext = createContext<
 	(path: string) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
-export const LogoutUserContext = createContext<React.Dispatch<Action>>(() => {});
+export const AuthenticatedMultipartPostContext = createContext<
+	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
+>(() => Promise.resolve({} as AxiosResponse));
+export const LogoutUserContext = createContext<React.Dispatch<Action>>(
+	() => {}
+);
 
 function currentUserReducer(
 	state: UserContextType,
@@ -71,7 +89,6 @@ function currentUserReducer(
 	}
 }
 
-
 export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 	children,
 }) => {
@@ -81,37 +98,50 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 		initialCurrentUser
 	);
 	const refreshKey = useRef<string>(initialRefreshKey);
+	const RefreshKeyContext = createContext<MutableRefObject<string>>(refreshKey);
 
-	const authenticatedFetch = async (
-		path: string
-	): Promise<AxiosResponse<object> | null> => {
-		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey.current,
-			});
-			if (accessKeyData.status === 200) {
-				try {
-					const response = await axios.get(path, {
-						headers: {
-							Authorization: `Bearer ${accessKeyData.data.access}`,
-						},
-					});
-					return response;
-				} catch (err) {
-					console.error(err);
+	const navigate = useNavigate();
+
+	const authenticatedFetch = useCallback(
+		async (path: string): Promise<AxiosResponse<object> | null> => {
+			try {
+				const accessKeyData = await axios.post('api/token/refresh/', {
+					refresh: refreshKey.current,
+				});
+				if (accessKeyData.status === 200) {
+					try {
+						const response = await axios.get(path, {
+							headers: {
+								Authorization: `Bearer ${accessKeyData.data.access}`,
+							},
+						});
+						return response;
+					} catch (err) {
+						console.error(err);
+						return null;
+					}
+				} else {
+					dispatch({ type: 'LOG_OUT' });
+					localStorage.removeItem('refresh');
+					console.log('refresh key has been cleared from everywhere!!');
+					navigate('signin');
 					return null;
 				}
-			} else {
+			} catch (err) {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				console.error(err);
+				navigate('signin');
 				return null;
 			}
-		} catch (err) {
-			console.error(err);
-			return null;
-		}
-	};
+		},
+		[navigate]
+	);
 
 	const authenticatedPost = async (
-		path: string, body: object
+		path: string,
+		body: object
 	): Promise<AxiosResponse<PostResponseData> | null> => {
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
@@ -130,16 +160,24 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 					return null;
 				}
 			} else {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				navigate('signin');
 				return null;
 			}
 		} catch (err) {
+			dispatch({ type: 'LOG_OUT' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!');
 			console.error(err);
+			navigate('signin');
 			return null;
 		}
 	};
 
 	const authenticatedDelete = async (
-		path: string,
+		path: string
 	): Promise<AxiosResponse<object> | null> => {
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
@@ -158,12 +196,68 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 					return null;
 				}
 			} else {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				navigate('signin');
 				return null;
 			}
 		} catch (err) {
+			dispatch({ type: 'LOG_OUT' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!');
 			console.error(err);
+			navigate('signin');
 			return null;
 		}
+	};
+
+	const authenticatedMultipartPost = async (
+		path: string,
+		body: object
+	): Promise<AxiosResponse<PostResponseData> | null> => {
+		try {
+			const accessKeyData = await axios.post('api/token/refresh/', {
+				refresh: refreshKey.current,
+			});
+			if (accessKeyData.status === 200) {
+				try {
+					const response = await axios.post(path, body, {
+						headers: {
+							'Content-Type': 'multipart/form-data',
+							Authorization: `Bearer ${accessKeyData.data.access}`,
+						},
+					});
+					return response;
+				} catch (err) {
+					console.error(err);
+					return null;
+				}
+			} else {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				navigate('signin');
+				return null;
+			}
+		} catch (err) {
+			dispatch({ type: 'LOG_OUT' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!');
+			console.error(err);
+			navigate('signin');
+			return null;
+		}
+	};
+
+	const fetchAndSetTokens = async (signinData: signinDataType) => {
+		const signinTokens = await axios.post('api/token/', signinData);
+		console.log('refreshKey before setting: ', refreshKey);
+		refreshKey.current = signinTokens.data.refresh;
+		console.log('refreshKey after setting: ', refreshKey.current);
+		setUserWithRefreshKey();
+		localStorage.setItem('refresh', signinTokens.data.refresh);
+		console.log('refresh token set in localstorage', signinTokens.data.refresh);
 	};
 
 	const fetchUser = useCallback(async () => {
@@ -184,19 +278,18 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 			console.log('fetchUser error: ', err);
 			return null;
 		}
-	}, []);
+	}, [authenticatedFetch]);
 
 	const setUserWithRefreshKey = useCallback(() => {
-		console.log('setting user with refresh key function runs')
+		console.log('setting user with refresh key function runs');
 		fetchUser().then((user) => {
 			if (user) {
-				console.log('newUser: ', user)
+				console.log('newUser: ', user);
 				dispatch({
 					type: 'LOG_IN',
-					payload: {user},
+					payload: { user },
 				});
 			}
-			
 		});
 	}, [fetchUser]);
 
@@ -204,27 +297,27 @@ export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
 		if (refreshKey) {
 			setUserWithRefreshKey();
 		}
-	},[setUserWithRefreshKey])
-
-
+	}, [setUserWithRefreshKey]);
 
 	return (
 		<ErrorBoundary>
 			<CurrentUserContext.Provider value={currentUser}>
 				<RefreshKeyContext.Provider value={refreshKey}>
-					<AuthenticatedFetchContext.Provider value={authenticatedFetch}>
-					<AuthenticatedPostContext.Provider value={authenticatedPost}>
-					<AuthenticatedDeleteContext.Provider value={authenticatedDelete}>
-						<LogoutUserContext.Provider value={dispatch}>
-							<SetUserWithRefreshKeyContext.Provider
-								value={setUserWithRefreshKey}
-							>
-								{children}
-							</SetUserWithRefreshKeyContext.Provider>
-						</LogoutUserContext.Provider>
-					</AuthenticatedDeleteContext.Provider>
-					</AuthenticatedPostContext.Provider>
-					</AuthenticatedFetchContext.Provider>
+					<FetchTokensContext.Provider value={fetchAndSetTokens}>
+						<AuthenticatedFetchContext.Provider value={authenticatedFetch}>
+							<AuthenticatedPostContext.Provider value={authenticatedPost}>
+								<AuthenticatedMultipartPostContext.Provider
+									value={authenticatedMultipartPost}>
+									<AuthenticatedDeleteContext.Provider
+										value={authenticatedDelete}>
+										<LogoutUserContext.Provider value={dispatch}>
+											{children}
+										</LogoutUserContext.Provider>
+									</AuthenticatedDeleteContext.Provider>
+								</AuthenticatedMultipartPostContext.Provider>
+							</AuthenticatedPostContext.Provider>
+						</AuthenticatedFetchContext.Provider>
+					</FetchTokensContext.Provider>
 				</RefreshKeyContext.Provider>
 			</CurrentUserContext.Provider>
 		</ErrorBoundary>

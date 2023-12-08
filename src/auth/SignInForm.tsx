@@ -8,7 +8,7 @@ import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { SetUserWithRefreshKeyContext } from '../contexts/CurrentUserContext';
+import { RefreshKeyContext, SetUserWithRefreshKeyContext } from '../contexts/CurrentUserContext';
 // import { axiosRes } from '../api/axiosDefaults';
 
 type signinDataType = {
@@ -34,6 +34,7 @@ type ErrorResponse = {
 
 const SignInForm = () => {
 	const setUserWithRefreshKey = useContext(SetUserWithRefreshKeyContext)
+	const refreshKey = useContext(RefreshKeyContext)
 
 	const [signinData, setSigninData] = useState<signinDataType>({
 		username: '',
@@ -63,9 +64,12 @@ const SignInForm = () => {
 			const signinDataResponse = await axios.post('dj-rest-auth/login/', signinData)
 			if (signinDataResponse.status === 200) {
 				const signinTokens = await axios.post('api/token/', signinData);
-				setUserWithRefreshKey(signinTokens.data.refresh);
+				console.log('refreshKey before setting: ', refreshKey!.current)
+				refreshKey!.current = signinTokens.data.refresh;
+				console.log('refreshKey after setting: ', refreshKey!.current);
+				setUserWithRefreshKey();
 				localStorage.setItem('refresh', signinTokens.data.refresh);
-				console.log('refresh token set in localstorage', signinData);
+				console.log('refresh token set in localstorage', signinTokens.data.refresh);
 				
 				navigate('/feed');
 			}

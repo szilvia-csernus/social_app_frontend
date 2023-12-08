@@ -1,31 +1,20 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { CurrentUserStateContext, RefreshKeyContext } from '../../contexts/CurrentUserContext';
+import { AuthenticatedDeleteContext, AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
-import { type PostsType } from './PostsPage';
-import axios from 'axios';
+import { type PostsResponseType } from './PostTypes';
+import { PostType } from './PostTypes';
 
-export type PostType = {
-	id: string;
-	owner: string;
-	profile_id: number;
-	profile_image: string;
-	comments_count: number;
-	likes_count: number;
-	like_id: number | null;
-	title: string;
-	content: string;
-	image: string;
-	updated_at: string;
-};
+
 
 export type PostDetailProps = PostType & {
-	setPosts: Dispatch<SetStateAction<PostsType>>;
+	setPosts: Dispatch<SetStateAction<PostsResponseType>>;
 	postPage: boolean;
 };
+
 
 const PostDetail: FC<PostDetailProps> = ({
 	id,
@@ -43,43 +32,36 @@ const PostDetail: FC<PostDetailProps> = ({
 	postPage,
 }) => {
     
-	const currentUser = useContext(CurrentUserStateContext)
-	const refreshKey = useContext(RefreshKeyContext);
+	const currentUser = useContext(CurrentUserContext)
+	const authenticatedPost = useContext(AuthenticatedPostContext);
+	const authenticatedDelete = useContext(AuthenticatedDeleteContext);
 	const [isPostOwner, setIsPostOwner] = useState<boolean>(false);
 
 	useEffect(() => {
-		const postOwner = currentUser.user
-			? currentUser.user.username === owner
+		const postOwner = currentUser
+			? currentUser.username === owner
 			: false;
 		setIsPostOwner(postOwner)
 	}, [currentUser, owner])
 
 	const handleLike = async () => {
 		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey,
-			});
-			const { data } = await axios.post(
+			const response = await authenticatedPost(
 				'/likes/',
-				{ post: id },
-				{
-					headers: {
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				}
+				{ post: id }
 			);
-			if (data !== null) {
-				console.log('like response data', data);
-				setPosts((prevPosts: PostsType) => {
+			if (response && response.data && 'id' in response.data && typeof response.data.id === 'number') {
+				console.log('like response', response);
+				setPosts((prevPosts: PostsResponseType) => {
 					const indx = prevPosts.results.findIndex((post) => post.id === id);
 					const updatedResults = [...prevPosts.results];
-					console.log("prevPost", updatedResults[indx]);
+					console.log('prevPost', updatedResults[indx]);
 					updatedResults[indx] = {
 						...updatedResults[indx],
 						likes_count: updatedResults[indx].likes_count + 1,
-						like_id: data.id,
+						like_id: response.data.id,
 					};
-					console.log("updated Post", updatedResults[indx])
+					console.log('updated Post', updatedResults[indx]);
 					return {
 						...prevPosts,
 						results: updatedResults,
@@ -93,15 +75,8 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	const handleUnLike = async () => {
 		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey,
-			});
-			await axios.delete(`/likes/${like_id}`, {
-				headers: {
-					Authorization: `Bearer ${accessKeyData.data.access}`,
-				},
-			});
-			setPosts((prevPosts: PostsType) => {
+			await authenticatedDelete(`/likes/${like_id}`);
+			setPosts((prevPosts: PostsResponseType) => {
 				const indx = prevPosts.results.findIndex((post) => post.id === id);
 				const updatedResults = [...prevPosts.results];
 				console.log('prevPost', updatedResults[indx]);
@@ -159,7 +134,7 @@ const PostDetail: FC<PostDetailProps> = ({
 							<span onClick={handleUnLike}>
 								<i className={`fas fa-heart ${styles.Heart}`} />
 							</span>
-						) : currentUser.user ? (
+						) : currentUser ? (
 							<span onClick={handleLike}>
 								<i className={`far fa-heart ${styles.HeartOutline}`} />
 							</span>

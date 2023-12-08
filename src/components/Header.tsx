@@ -8,7 +8,7 @@ import myLogo from '../assets/logo.png';
 import styles from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
-	CurrentUserStateContext,
+	CurrentUserContext,
 	LogoutUserContext,
 } from '../contexts/CurrentUserContext';
 import Avatar from './Avatar';
@@ -16,7 +16,7 @@ import axios from 'axios';
 import useClickOutsideToggle from '../hooks/useClickOutsideToggle';
 
 function Header() {
-	const currentUserState = useContext(CurrentUserStateContext);
+	const currentUser = useContext(CurrentUserContext);
 	const dispatch = useContext(LogoutUserContext)
 
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
@@ -48,12 +48,12 @@ function Header() {
 				<i className="fas fa-sign-out-alt"></i> Logout
 			</Link>
 			<NavLink
-				to={`/profiles/${currentUserState.user?.profile_id}`}
+				to={`/profiles/${currentUser?.profile_id}`}
 				className={styles.NavLink}
 			>
-				{currentUserState.user && (
+				{currentUser && (
 					<Avatar
-						src={currentUserState.user.profile_image}
+						src={currentUser.profile_image}
 						text=""
 						height={40}
 					/>
@@ -94,12 +94,13 @@ function Header() {
 					</NavLink>
 				</Navbar.Brand>
 				<Navbar.Toggle
+					className={styles.Toggler}
 					onClick={() => setExpanded(!expanded)}
 					ref={ref}
 					aria-controls="basic-navbar-nav"
 				/>
 				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-					<Nav>{currentUserState.user ? loggedInIcons : loggedOutIcons}</Nav>
+					<Nav>{currentUser ? loggedInIcons : loggedOutIcons}</Nav>
 				</Navbar.Collapse>
 			</Container>
 		</Navbar>

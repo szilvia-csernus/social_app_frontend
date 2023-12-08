@@ -6,8 +6,8 @@ import styles from './Post.module.css';
 import { useParams } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
 // import { axiosReq } from '../../api/axiosDefaults';
-import PostDetail, { PostType } from './PostDetail';
-import { PostsType } from './PostsPage';
+import PostDetail from './PostDetail';
+import { PostType, PostsResponseType } from './PostTypes';
 import axios from 'axios';
 
 // type PostResults = {
@@ -16,7 +16,7 @@ import axios from 'axios';
 
 const PostPage: FC = () => {
 	const { id } = useParams();
-	const [posts, setPosts] = useState<PostsType>({
+	const [posts, setPosts] = useState<PostsResponseType>({
 		count: 0,
 		next: null,
 		previous: null,

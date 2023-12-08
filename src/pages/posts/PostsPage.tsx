@@ -1,4 +1,4 @@
-import { useContext, type FC, useState, useEffect } from 'react';
+import { useContext, type FC, useState, useEffect, SetStateAction } from 'react';
 
 // import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -6,33 +6,28 @@ import Row from 'react-bootstrap/Row';
 // import Container from 'react-bootstrap/Container';
 
 // import styles from './Post.module.css';
-// import { axiosRes } from '../../api/axiosDefaults';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-	CurrentUserStateContext,
+	AuthenticatedFetchContext,
+	CurrentUserContext,
 } from '../../contexts/CurrentUserContext';
 import Modal from '../../components/Modal';
 import Spinner from '../../components/Spinner';
-import PostDetail, { type PostType } from './PostDetail';
-import axios from 'axios';
+import PostDetail from './PostDetail';
+import axios, { AxiosResponse } from 'axios';
+import { PostsResponseType } from './PostTypes';
 
 type PostsProps = {
 	message: string;
 };
 
-export type PostsType = {
-	count: number;
-	next: string | null;
-	previous: string | null;
-	results: PostType[];
-};
-
 const PostsPage: FC<PostsProps> = ({ message }) => {
-	const currentUserState = useContext(CurrentUserStateContext);
+	const currentUser = useContext(CurrentUserContext);
+	const authenticatedFetch = useContext(AuthenticatedFetchContext)
 
 	const navigate = useNavigate();
 
-	const [posts, setPosts] = useState<PostsType>({
+	const [posts, setPosts] = useState<PostsResponseType>({
 		count: 0,
 		next: null,
 		previous: null,
@@ -45,51 +40,60 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 	useEffect(() => {
 		console.log('useEffect() for set filtering in PostPage runs');
 
-		let filter: string;
-		if (currentUserState && currentUserState.user) {
-			console.log('currentUserState: ', currentUserState);
+		let filter: string = '';
+		if (currentUser) {
+			console.log('currentUser: ', currentUser);
 			console.log('pathname: ', pathname);
 			switch (pathname) {
 				case '/feed':
-					filter = `owner__followed__owner__profile=${currentUserState.user.profile_id}&`;
+					filter = `owner__followed__owner__profile=${currentUser.profile_id}&`;
 					break;
 				case '/liked':
-					filter = `likes__owner__profile=${currentUserState.user.profile_id}&ordering=-likes__created_at&`;
+					filter = `likes__owner__profile=${currentUser.profile_id}&ordering=-likes__created_at&`;
 					break;
 			}
 		} else {
 			filter = '';
 		}
 
-		let postData;
+		console.log('filter after setting filter: ', filter)
+
+		let response: AxiosResponse<object> | null;
 		const fetchPosts = async () => {
 			try {
-				const accessKeyData = await axios.post('api/token/refresh/', {
-					refresh: currentUserState.refresh,
-				});
-				if (accessKeyData.data.access && filter) {
-					postData = await axios.get(`/posts/?${filter}`, {
-						headers: {
-							Authorization: `Bearer ${accessKeyData.data.access}`,
-						},
-					});
-					setPosts(postData.data);
-					console.log('posts set to: ', postData.data);
+				if (filter) {
+					response = await authenticatedFetch(`/posts/?${filter}`, 
+					);
+					if (response && response.data) {
+						const responseData = response.data;
+							setPosts(responseData as SetStateAction<PostsResponseType>);
+							console.log('responseData are not PostsResponseType!!')
+					} else {
+						console.log('response was not in the requiered format', response)
+					}
+					console.log('fetching filtered posts response: ', response)
+					
 				} else {
-					postData = await axios.get(`/posts/`);
-					setPosts(postData.data);
-					console.log('posts set to: ', postData.data);
+					response = await axios.get(`/posts/`);
+					if (response && response.data) {
+						const responseData = response.data;
+						setPosts(responseData as SetStateAction<PostsResponseType>);
+					}
+					console.log('fetching all posts response: ', response);
 				}
 
 				setHasLoaded(true);
 			} catch (err) {
 				console.log(err);
-				if (currentUserState.user) {
-					navigate('/login')
+				if (currentUser) {
+					navigate('login')
 				} else {
-					postData = await axios.get(`/posts/`);
-					setPosts(postData.data);
-					console.log('posts set to: ', postData.data);
+					response = await axios.get(`/posts/`);
+					if (response && response.data) {
+						const responseData = response.data;
+						setPosts(responseData as SetStateAction<PostsResponseType>);
+					}
+					console.log('fetching all posts response: ', response);
 					setHasLoaded(true);
 				}
 				
@@ -98,7 +102,7 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 
 		setHasLoaded(false);
 		fetchPosts();
-	}, [currentUserState, pathname, navigate]);
+	}, [currentUser, pathname, navigate, authenticatedFetch]);
 
 	return (
 		<Row className="h-100">

@@ -32,6 +32,7 @@ If you are developing a production application, we recommend updating the config
 * `react-bootstrap` & `bootstrap`
 * `axios`
 * `react-router-dom v6`
+* `react-infinite-scroll-component`
 * `serve` - for hosting on Heroku
 
 

@@ -18,8 +18,8 @@ const PostPage: FC = () => {
 	const { id } = useParams();
 	const [posts, setPosts] = useState<PostsResponseType>({
 		count: 0,
-		next: null,
-		previous: null,
+		next: '',
+		previous: '',
 		results: [],
 	});
 

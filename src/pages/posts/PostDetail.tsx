@@ -3,10 +3,11 @@ import styles from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
 import { AuthenticatedDeleteContext, AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { type PostsResponseType } from './PostTypes';
 import { PostType } from './PostTypes';
+import { MoreDropdown } from '../../components/MoreDropdown';
 
 
 
@@ -37,12 +38,34 @@ const PostDetail: FC<PostDetailProps> = ({
 	const authenticatedDelete = useContext(AuthenticatedDeleteContext);
 	const [isPostOwner, setIsPostOwner] = useState<boolean>(false);
 
+	const navigate = useNavigate();
+
 	useEffect(() => {
 		const postOwner = currentUser
 			? currentUser.username === owner
 			: false;
 		setIsPostOwner(postOwner)
 	}, [currentUser, owner])
+
+	const handleEdit = () => {
+		navigate(`post/${id}/edit`);
+	}
+
+	const handleDelete = async () => {
+		try {
+			await authenticatedDelete(`/posts/${id}`);
+			setPosts((prevPosts: PostsResponseType) => {
+				const updatedResults = prevPosts.results.filter((post) => post.id !== id);
+				return {
+					...prevPosts,
+					results: updatedResults,
+				};
+			});
+			navigate(-1);
+		} catch (err) {
+			console.log(err);
+		}
+	}
 
 	const handleLike = async () => {
 		try {
@@ -106,13 +129,13 @@ const PostDetail: FC<PostDetailProps> = ({
 							<Avatar src={profile_image} height={55} text="" />
 							{owner}
 						</Link>
-						<div className="d-flex align-items-center">
+						<div className="d-flex gap-1 align-items-center">
 							<span>{updated_at}</span>
-							{isPostOwner && postPage && '...'}
+							{isPostOwner && postPage && <MoreDropdown handleEdit={handleEdit} handleDelete={handleDelete}/>}
 						</div>
 					</div>
 				</Card.Body>
-				<Link to={`/posts${id}`}>
+				<Link to={`/posts/${id}`}>
 					<Card.Img src={image} alt={title} />
 				</Link>
 				<Card.Body>

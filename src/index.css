@@ -38,12 +38,12 @@ i {
   font-size: 1.6rem;
   padding: 7px;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .active {
   color: var(--primary-color);
 }
-
 
 .Main {
   padding-top: 81px;

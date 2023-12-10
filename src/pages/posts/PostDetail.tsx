@@ -48,7 +48,7 @@ const PostDetail: FC<PostDetailProps> = ({
 	}, [currentUser, owner])
 
 	const handleEdit = () => {
-		navigate(`post/${id}/edit`);
+		navigate(`/posts/${id}/edit`);
 	}
 
 	const handleDelete = async () => {

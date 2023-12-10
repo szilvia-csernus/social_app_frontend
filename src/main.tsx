@@ -13,6 +13,7 @@ import PostPage from './pages/posts/PostPage.tsx';
 import PostsPage from './pages/posts/PostsPage.tsx';
 import Modal from './components/Modal.tsx';
 import Spinner from './components/Spinner.tsx';
+import PostEditForm from './pages/posts/PostEditForm.tsx';
 
 
 const router = createBrowserRouter([
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
 			{
 				path: 'posts/:id',
 				element: <PostPage />,
+			},
+			{
+				path: 'posts/:id/edit',
+				element: <PostEditForm />,
 			},
 			{ path: 'profiles', element: 'Profiles page' },
 		],

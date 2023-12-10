@@ -22,3 +22,21 @@ export type PostsResponseType = {
 	results: PostType[];
 };
 
+export type EditPostResponseType = {
+	title: string;
+	content: string;
+	image: string;
+	is_owner: boolean;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isEditPostResponseType(obj: any): obj is EditPostResponseType {
+	return (
+		typeof obj === 'object' &&
+		obj !== null &&
+		typeof obj.title === 'string' &&
+		typeof obj.content === 'string' &&
+		typeof obj.image === 'string' &&
+		typeof obj.is_owner === 'boolean'
+	);
+}

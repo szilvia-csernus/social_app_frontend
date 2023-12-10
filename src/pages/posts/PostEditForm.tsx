@@ -1,21 +1,21 @@
-import React, { ChangeEvent, useContext, useRef, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import { Alert, Image } from 'react-bootstrap';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { type AxiosResponse } from 'axios';
 
 import Upload from '../../assets/upload.png';
+import Asset from '../../components/Asset';
+import { AuthenticatedFetchContext, AuthenticatedMultipartPutContext } from '../../contexts/CurrentUserContext';
 
 import styles from './Post.module.css';
-
 import btnStyles from '../../components/Button.module.css';
-import Asset from '../../components/Asset';
-import { Alert, Image } from 'react-bootstrap';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { type AxiosResponse } from 'axios';
-import { AuthenticatedMultipartPostContext } from '../../contexts/CurrentUserContext';
+import { isEditPostResponseType } from './PostTypes';
 
 
 type PostData = {
@@ -34,11 +34,11 @@ interface AxiosError extends Error {
 type errorDetail = string[];
 
 type errorDataType =
-	| {
-		title: errorDetail;
-		content: errorDetail;
-		image: errorDetail;
-	}
+	|   {
+			title: errorDetail;
+			content: errorDetail;
+			image: errorDetail;
+        }
 	| undefined;
 
 type PostError = {
@@ -51,21 +51,47 @@ interface PostErrorResponse extends AxiosResponse {
 	data: PostError | undefined;
 }
 
-function PostCreateForm() {
+function PostEditForm() {
 	const [errors, setErrors] = useState<errorDataType>();
 	const [postData, setPostData] = useState<PostData>({
 		title: '',
 		content: '',
 		image: '',
 	});
-	const authenticatedMultipartPost = useContext(AuthenticatedMultipartPostContext)
+	
+	const authenticatedMultipartPut = useContext(
+		AuthenticatedMultipartPutContext
+	);
+
+    const authenticatedFetch = useContext(AuthenticatedFetchContext)
 
 	const { title, content, image } = postData;
 
 	const imageInput = useRef<HTMLInputElement | null>(null);
-	
+
 	const location = useLocation();
 	const navigate = useNavigate();
+    const { id } = useParams();
+
+    useEffect(() => {
+        const HandleMount = async () => {
+
+            console.log("location: ", id)
+            const response = (await authenticatedFetch(`/posts/${id}/`))
+            if (response && response.data) {
+                const responseData = response.data;
+                if (isEditPostResponseType(responseData)) {
+                    const {title, content, image, is_owner} = responseData;
+                    is_owner ? setPostData({title, content, image}) : navigate('/')
+                }
+            }
+
+            
+            console.log('fetching filtered posts response: ', response)
+        }
+
+        HandleMount();
+    }, [authenticatedFetch, location, navigate, id])
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setPostData({
@@ -91,17 +117,17 @@ function PostCreateForm() {
 		formData.append('title', title);
 		formData.append('content', content);
 		if (imageInput.current && imageInput.current.files) {
-			formData.append('image', imageInput.current.files[0])
+			formData.append('image', imageInput.current.files[0]);
 		}
 
 		try {
-			const response = await authenticatedMultipartPost('/posts/', formData);
+			const response = await authenticatedMultipartPut(`/posts/${id}/`, formData);
 			if (response) {
 				navigate(`/posts/${response.data.id}`, { state: { from: location } });
 			}
 		} catch (err) {
 			const axiosError = err as AxiosError;
-			console.log('axios error', axiosError)
+			console.log('axios error', axiosError);
 			if (axiosError.response && axiosError.response.data) {
 				const { data } = axiosError.response as PostErrorResponse;
 				setErrors({
@@ -111,7 +137,7 @@ function PostCreateForm() {
 				});
 			}
 		}
-	}
+	};
 
 	const handleCancel = () => {
 		const previousLocation = location.state?.from || '/';
@@ -159,10 +185,8 @@ function PostCreateForm() {
 			>
 				cancel
 			</Button>
-			<Button
-				className={`${btnStyles.Button} ${btnStyles.Blue}`}
-				type="submit">
-				create
+			<Button className={`${btnStyles.Button} ${btnStyles.Blue}`} type="submit">
+				update
 			</Button>
 		</div>
 	);
@@ -205,7 +229,7 @@ function PostCreateForm() {
 								type="file"
 								id="image-upload"
 								accept="image/*"
-								className="mb-2"
+                                className="mb-2"
 								onChange={handleChangeImage}
 								ref={imageInput}
 							/>
@@ -220,13 +244,11 @@ function PostCreateForm() {
 					</Container>
 				</Col>
 				<Col md={5} lg={4} className="d-none d-md-block p-0 my-2">
-					<Container className={`Content ${styles.Container}`}>
-						{textFields}
-					</Container>
+					<Container className={`Content ${styles.Container}`}>{textFields}</Container>
 				</Col>
 			</Row>
 		</Form>
 	);
 }
 
-export default PostCreateForm;
+export default PostEditForm;

@@ -7,8 +7,9 @@ import { useParams } from 'react-router-dom';
 import { FC, useContext, useEffect, useState } from 'react';
 import PostDetail from './PostDetail';
 import { PostType, PostsResponseType } from './PostTypes';
-
-import CommentCreateForm, { CommentsResponseType } from '../comments/CommentCreateForm';
+import Comment from '../comments/Comment';
+import { CommentsResponseType, CommentsType } from '../comments/CommentTypes';
+import CommentCreateForm from '../comments/CommentCreateForm';
 import { AuthenticatedFetchContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 
 
@@ -25,7 +26,6 @@ const PostPage: FC = () => {
 		results: [],
 	});
 	const currentUser = useContext(CurrentUserContext);
-	const profile_image = currentUser?.profile_image;
 	const [comments, setComments] = useState<CommentsResponseType>({
 		count: 0,
 		next: '',
@@ -39,21 +39,28 @@ const PostPage: FC = () => {
 		const handleMount = async () => {
 			try {
 				// Promise.all() returns an array of resolved data
-				const [response] = await Promise.all([
+				const responses = await Promise.all([
 					authenticatedFetch(`/posts/${id}`),
+					authenticatedFetch(`/comments/?post=${id}`)
 				]);
 				if (
-					response &&
-					response.data 
+					responses &&
+					responses.length > 0 &&
+					responses[0]
 				) {
-					const postData = response.data as PostType
+					const postData = responses[0].data as PostType
 					
 					setPosts((prevState) => {
 						return { ...prevState, results: [postData], };
 					});
-					// setPost(data.results[0]);
+					if (responses[1] && responses[1].data && 'results' in responses[1].data) {
+						const commentsData = responses[1].data.results as CommentsType
+						setComments((prevState) => {
+							return { ...prevState, results: commentsData}
+						})
+					}
 				}
-				console.log('post rendered by PostPage handleMount in useEffect', response);
+				console.log('post rendered by PostPage handleMount in useEffect', responses);
 			} catch (err) {
 				console.log(err);
 			}
@@ -63,37 +70,48 @@ const PostPage: FC = () => {
 	}, [id, authenticatedFetch]);
 
 	return (
-		<Row className="h-100">
-			<Col className="py-2 p-0 p-lg-2" lg={8}>
-				<p>Popular profiles for mobile</p>
-				{/* postPage will evaluate as truthy inside this PostPage component! */}
-				{
-					<PostDetail
-						key={id}
-						{...posts.results[0]}
-						setPosts={setPosts}
-						postPage
-					/>
-				}
-				{/* {post && <PostDetail {...post} setPost={setPost} postPage/>} */}
-				<Container className={styles.Content}>
-					{(currentUser && id) ? (
-						<CommentCreateForm
-							profile_id={currentUser.profile_id}
-							profileImage={profile_image}
-							post_id={id}
+		<>
+			{ id && <Row className="h-100">
+				<Col className="py-2 p-0 p-lg-2" lg={8}>
+					<p>Popular profiles for mobile</p>
+					{/* postPage will evaluate as truthy inside this PostPage component! */}
+					{
+						<PostDetail
+							key={id}
+							{...posts.results[0]}
 							setPosts={setPosts}
-							setComments={setComments}
+							postPage
 						/>
-					) : comments.results.length ? (
-						'Comments'
-					) : null}
-				</Container>
-			</Col>
-			<Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
-				Popular profiles for desktop
-			</Col>
-		</Row>
+					}
+					{/* {post && <PostDetail {...post} setPost={setPost} postPage/>} */}
+					<Container className={styles.Content}>
+						{currentUser ? (
+							<CommentCreateForm
+								profileId={currentUser.profile_id}
+								profileImage={currentUser.profile_image}
+								postId={id}
+								setPosts={setPosts}
+								setComments={setComments}
+							/>
+						) : comments.results.length > 0 ? (
+							'Comments'
+						) : null}
+						{ comments.results.length > 0 ? (
+							comments.results.map((comment) => (
+								<Comment key={comment.id} {...comment} />
+								
+							))
+						) : currentUser ? (
+							<span>No comments yet, be the first to comment!</span>
+						)
+						: <span>No comments... yet</span> }
+					</Container>
+				</Col>
+				<Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
+					Popular profiles for desktop
+				</Col>
+			</Row>}
+		</>
 	);
 };
 

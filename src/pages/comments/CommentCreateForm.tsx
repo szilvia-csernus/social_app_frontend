@@ -4,39 +4,23 @@ import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-import styles from './CommentCreateEditForm.module.css';
+import styles from './Comment.module.css';
 import btnStyles from '../../components/Button.module.css';
 import Avatar from '../../components/Avatar';
 import { AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { PostsResponseType } from '../posts/PostTypes';
+import { CommentsResponseType } from './CommentTypes';
 
-
-
-export type CommentType = {
-    owner: number;
-    content: string;
-	post: number;
-}
-
-export type CommentsType = CommentType[]
-
-export type CommentsResponseType = {
-	count: number;
-	next: string;
-	previous: string;
-	results: CommentsType;
-};
-
-type CommentPropsType = {
-	post_id: string;
+type CreateCommentPropsType = {
+	postId: string;
 	setPosts: Dispatch<SetStateAction<PostsResponseType>>;
 	setComments: Dispatch<SetStateAction<CommentsResponseType>>;
 	profileImage: string;
-	profile_id: number;
+	profileId: number;
 };
 
-function CommentCreateForm(props: CommentPropsType) {
-	const { post_id, setPosts, setComments, profileImage, profile_id } = props;
+function CommentCreateForm(props: CreateCommentPropsType) {
+	const { postId, setPosts, setComments, profileImage, profileId } = props;
 	const [content, setContent] = useState('');
 
 	const currentUser = useContext(CurrentUserContext);
@@ -56,22 +40,23 @@ function CommentCreateForm(props: CommentPropsType) {
 		try {
 			const response = await authenticatedPost('/comments/', {
 				content,
-				post: post_id
+				post: postId
 			});
             if (response && response.status === 200) {
-                setComments((prevComments) => {
-				return {
-                    ...prevComments,
-                    results: [
-						{
-						// comment submission was authenticated, hence we know there is a currentUser
-						owner: currentUser!.profile_id, 
-						content,
-						post: Number(post_id),
-						},
-						...prevComments.results
-					],
-                }});
+                // setComments((prevComments) => {
+				// return {
+                //     ...prevComments,
+                //     results: [
+				// 		{
+				// 		// comment submission was authenticated, hence we know there is a currentUser
+				// 		id: response.data.id,
+				// 		owner: currentUser!.profile_id, 
+				// 		content,
+				// 		post: Number(postId),
+				// 		},
+				// 		...prevComments.results
+				// 	],
+                // }});
             } else {
                 console.log('response was not in the requiered format', response);
             }
@@ -98,7 +83,7 @@ function CommentCreateForm(props: CommentPropsType) {
 		<Form className="mt-2" onSubmit={handleSubmit}>
 			<Form.Group>
 				<InputGroup>
-					<Link to={`/profiles/${profile_id}`}>
+					<Link to={`/profiles/${profileId}`}>
 						<Avatar src={profileImage} />
 					</Link>
 					<Form.Control

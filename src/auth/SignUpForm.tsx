@@ -158,7 +158,7 @@ const SignUpForm = () => {
 						</Form>
 
 					<div className="mt-3">
-						<Link className={styles.Link} to="/singin">
+						<Link className={styles.Link} to="/signin">
 						Already have an account?
 							<span>Log in</span>
 						</Link>

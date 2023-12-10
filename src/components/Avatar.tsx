@@ -1,9 +1,9 @@
-import classes from './Avatar.module.css';
+import styles from './Avatar.module.css';
 
 type AvatarPropsType = {
     src: string;
-    height: number;
-    text: string;
+    height?: number;
+    text?: string;
 }
 
 function Avatar({ src, height = 45, text }: AvatarPropsType) {
@@ -11,7 +11,7 @@ function Avatar({ src, height = 45, text }: AvatarPropsType) {
 		<span>
 			<img
 				src={src}
-				className={classes.avatar}
+				className={styles.Avatar}
 				height={height}
 				width={height}
 				alt="avatar"

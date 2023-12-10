@@ -14,12 +14,14 @@ export type PostType = {
 	updated_at: string;
 };
 
+export type PostsType = PostType[]
+
 
 export type PostsResponseType = {
 	count: number;
 	next: string;
 	previous: string;
-	results: PostType[];
+	results: PostsType;
 };
 
 export type EditPostResponseType = {

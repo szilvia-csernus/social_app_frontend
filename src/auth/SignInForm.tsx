@@ -130,7 +130,7 @@ const SignInForm = () => {
 							))}
 
 						<Button
-							className={`${btnStyles.Button} ${btnStyles.Wide} ${btnStyles.Bright}`}
+							className={`${btnStyles.Button} ${btnStyles.Wide} ${btnStyles.Bright} mb-2`}
 							type="submit"
 						>
 							Sign In

@@ -6,7 +6,7 @@ import illustration from '../assets/signup.jpg';
 
 import { type ChangeEvent, useState, FormEvent } from 'react';
 import axios, { AxiosError } from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 type SignUpDataType = {
@@ -43,7 +43,7 @@ const SignUpForm = () => {
 
 	const {username, password1, password2 } = signUpData;
 
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const {name, value} = event.target;
@@ -59,12 +59,8 @@ const SignUpForm = () => {
 		event.preventDefault();
 
 		try {
-			await axios.post('dj-rest-auth/registration/', signUpData, {
-				headers: {
-					"Content-Type": 'multipsrt/form-data',
-				}
-			});
-			// navigate('login');
+			await axios.post('dj-rest-auth/registration/', signUpData,);
+			navigate('/signin');
 		} catch (error) {
 			console.log(error)
 			if (axios.isAxiosError(error)) {
@@ -148,7 +144,7 @@ const SignUpForm = () => {
 								))}
 
 							<Button
-								className={`${btnStyles.Button} ${btnStyles.Wide} ${btnStyles.Bright}`}
+								className={`${btnStyles.Button} ${btnStyles.Wide} ${btnStyles.Bright} mb-2`}
 								type="submit"
 							>
 								Sign Up

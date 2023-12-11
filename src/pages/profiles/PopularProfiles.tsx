@@ -3,8 +3,13 @@ import { Container} from 'react-bootstrap'
 import { AuthenticatedFetchContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { PopularProfilesResponseType, ProfileDataType } from './ProfileTypes';
 import Asset from '../../components/Asset';
+import Profile from './Profile';
 
-function PopularProfiles() {
+type PopularProfileProps = {
+    mobile?: boolean;
+}
+
+function PopularProfiles({mobile}:PopularProfileProps) {
     const [profileData, setProfileData] = useState<ProfileDataType>({
         // we will use the pageProfile later!
         pageProfile: {},
@@ -40,13 +45,21 @@ function PopularProfiles() {
     }, [currentUser, authenticatedFetch])
 
   return (
-		<Container className="Content">
+		<Container className={`Content ${mobile && 'd-lg-none text-center mb-3'}`}>
 			{popularProfiles.results.length > 0 ? (
 				<>
 					<p>Most followed profiles</p>
-					{popularProfiles.results.map((profile) => (
-						<p key={profile.id}>{profile.owner}</p>
-					))}
+					{mobile ? (
+						<div className="d-flex justify-content-around">
+							{popularProfiles.results.slice(0, 4).map((profile) => (
+								<Profile key={profile.id} profile={profile} mobile/>
+							))}
+						</div>
+					) : (
+						popularProfiles.results.map((profile) => (
+							<Profile key={profile.id} profile={profile} />
+						))
+					)}
 				</>
 			) : (
 				<Asset spinner />

@@ -1,6 +1,6 @@
 export type CommentType = {
 	id: number;
-	owner: number;
+	owner: string;
 	content: string;
 	post: number;
 	profile_id: number;

@@ -9,7 +9,7 @@ import btnStyles from '../../components/Button.module.css';
 import Avatar from '../../components/Avatar';
 import { AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { PostsResponseType } from '../posts/PostTypes';
-import { CommentsResponseType } from './CommentTypes';
+import { CommentType, CommentsResponseType } from './CommentTypes';
 
 type CreateCommentPropsType = {
 	postId: string;
@@ -42,21 +42,18 @@ function CommentCreateForm(props: CreateCommentPropsType) {
 				content,
 				post: postId
 			});
-            if (response && response.status === 200) {
-                // setComments((prevComments) => {
-				// return {
-                //     ...prevComments,
-                //     results: [
-				// 		{
-				// 		// comment submission was authenticated, hence we know there is a currentUser
-				// 		id: response.data.id,
-				// 		owner: currentUser!.profile_id, 
-				// 		content,
-				// 		post: Number(postId),
-				// 		},
-				// 		...prevComments.results
-				// 	],
-                // }});
+            if (response && response.status === 201) {
+				console.log('create comment response', response)
+                setComments((prevComments: CommentsResponseType) => {
+				return {
+                    ...prevComments,
+                    results: [
+						{
+						...response.data as CommentType,
+						},
+						...prevComments.results
+					],
+                }});
             } else {
                 console.log('response was not in the requiered format', response);
             }

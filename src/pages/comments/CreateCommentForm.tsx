@@ -19,7 +19,7 @@ type CreateCommentPropsType = {
 	profileId: number;
 };
 
-function CommentCreateForm(props: CreateCommentPropsType) {
+function CreateCommentForm(props: CreateCommentPropsType) {
 	const { postId, setPosts, setComments, profileImage, profileId } = props;
 	const [content, setContent] = useState('');
 
@@ -106,4 +106,4 @@ function CommentCreateForm(props: CreateCommentPropsType) {
 	);
 }
 
-export default CommentCreateForm;
+export default CreateCommentForm;

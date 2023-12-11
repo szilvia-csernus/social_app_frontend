@@ -51,7 +51,7 @@ interface PostErrorResponse extends AxiosResponse {
 	data: PostError | undefined;
 }
 
-function PostEditForm() {
+function EditPostForm() {
 	const [errors, setErrors] = useState<errorDataType>();
 	const [postData, setPostData] = useState<PostData>({
 		title: '',
@@ -251,4 +251,4 @@ function PostEditForm() {
 	);
 }
 
-export default PostEditForm;
+export default EditPostForm;

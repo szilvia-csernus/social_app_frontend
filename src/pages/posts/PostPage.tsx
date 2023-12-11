@@ -9,7 +9,7 @@ import PostDetail from './PostDetail';
 import { PostType, PostsResponseType } from './PostTypes';
 import Comment from '../comments/Comment';
 import { CommentsResponseType, CommentsType } from '../comments/CommentTypes';
-import CommentCreateForm from '../comments/CommentCreateForm';
+import CreateCommentForm from '../comments/CreateCommentForm';
 import {
 	AuthenticatedFetchContext,
 	CurrentUserContext,
@@ -92,7 +92,7 @@ const PostPage: FC = () => {
 						{/* {post && <PostDetail {...post} setPost={setPost} postPage/>} */}
 						<Container className={styles.Content}>
 							{currentUser ? (
-								<CommentCreateForm
+								<CreateCommentForm
 									profileId={currentUser.profile_id}
 									profileImage={currentUser.profile_image}
 									postId={id}

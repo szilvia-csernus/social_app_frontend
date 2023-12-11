@@ -8,12 +8,12 @@ import SignUpForm from './auth/SignUpForm.tsx';
 import SignInForm from './auth/SignInForm.tsx';
 // import { CurrentUserProvider } from './contexts/CurrentUserContext';
 // import React from 'react';
-import PostCreateEditForm from './pages/posts/PostCreateEditForm.tsx';
+import CreatePostForm from './pages/posts/CreatePostForm.tsx';
 import PostPage from './pages/posts/PostPage.tsx';
 import PostsPage from './pages/posts/PostsPage.tsx';
 import Modal from './components/Modal.tsx';
 import Spinner from './components/Spinner.tsx';
-import PostEditForm from './pages/posts/PostEditForm.tsx';
+import EditPostForm from './pages/posts/EditPostForm.tsx';
 
 
 const router = createBrowserRouter([
@@ -42,14 +42,14 @@ const router = createBrowserRouter([
 			},
 			{ path: 'signin', element: <SignInForm /> },
 			{ path: 'signup', element: <SignUpForm /> },
-			{ path: 'posts/create', element: <PostCreateEditForm /> },
+			{ path: 'posts/create', element: <CreatePostForm /> },
 			{
 				path: 'posts/:id',
 				element: <PostPage />,
 			},
 			{
 				path: 'posts/:id/edit',
-				element: <PostEditForm />,
+				element: <EditPostForm />,
 			},
 			{ path: 'profiles', element: 'Profiles page' },
 		],

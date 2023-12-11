@@ -3,10 +3,11 @@ import styles from './Comment.module.css';
 import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { CommentType, CommentsResponseType } from './CommentTypes';
-import { Dispatch, SetStateAction, useContext } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { AuthenticatedDeleteContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { MoreDropdown } from '../../components/MoreDropdown';
 import { PostsResponseType } from '../posts/PostTypes';
+import EditCommentForm from './EditCommentForm';
 
 type CommentPropsType = CommentType & {
     setPosts: Dispatch<SetStateAction<PostsResponseType>>;
@@ -18,8 +19,10 @@ function Comment({id, profile_id, profile_image, owner, updated_at, content, set
     const isCommentOwner = currentUser ? currentUser.username === owner : false;
     const authenticatedDelete = useContext(AuthenticatedDeleteContext);
 
+    const [showEditForm, setShowEditForm] = useState(false);
+
     const handleEdit = () => {
-            // navigate(`/posts/${post}/`);
+        setShowEditForm(true)
         };
 
     const handleDelete = async () => {
@@ -55,24 +58,37 @@ function Comment({id, profile_id, profile_image, owner, updated_at, content, set
 			<Card.Body>
 				<div className="d-flex align-items-center justify-content-between gap-2">
 					<div className="d-flex gap-2">
-                        <Link to={`/profiles/${profile_id}`} className="d-flex gap-2">
-                            <Avatar src={profile_image} height={55} text="" />
-                        </Link>
-                        <div>
-                            <div>
-                                <span className={styles.Owner}>{owner}</span>
-                                <span className={styles.Date}>{updated_at}</span>
-                            </div>
-                            <p>{content}</p>
-                        </div>
+						<Link to={`/profiles/${profile_id}`} className="d-flex gap-2">
+							<Avatar src={profile_image} height={55} text="" />
+						</Link>
+						<div>
+							<div>
+								<span className={styles.Owner}>{owner}</span>
+								<span className={styles.Date}>{updated_at}</span>
+							</div>
+							<>
+								{showEditForm ? (
+									<EditCommentForm
+										id={id}
+										profile_id={profile_id}
+										content={content}
+										profile_image={profile_image}
+										setComments={setComments}
+										setShowEditForm={setShowEditForm}
+									/>
+								) : (
+									<p>{content}</p>
+								)}
+							</>
+						</div>
 					</div>
 					<div className="d-flex gap-1 align-items-center">
-							{isCommentOwner && (
-								<MoreDropdown
-									handleEdit={handleEdit}
-									handleDelete={handleDelete}
-								/>
-							)}
+						{isCommentOwner && !showEditForm && (
+							<MoreDropdown
+								handleEdit={handleEdit}
+								handleDelete={handleDelete}
+							/>
+						)}
 					</div>
 				</div>
 			</Card.Body>

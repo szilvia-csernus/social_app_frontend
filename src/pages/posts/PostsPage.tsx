@@ -15,7 +15,7 @@ import {
 } from '../../contexts/CurrentUserContext';
 import PostDetail from './PostDetail';
 import { AxiosResponse } from 'axios';
-import { PostsResponseType } from './PostTypes';
+import { PostType, PostsResponseType } from './PostTypes';
 import NoResults from '../../assets/no-results.png';
 import { Container, Form } from 'react-bootstrap';
 import Asset from '../../components/Asset';
@@ -117,13 +117,11 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 								loader={<Asset spinner />}
 								hasMore={!!posts.next}
 								next={() => {
-									fetchMoreData(authenticatedFetch, posts, setPosts)
-										.then(() => {
-											console.log('Data fetched successfully');
-										})
-										.catch((error) => {
-											console.error('Failed to fetch data:', error);
-										});
+									fetchMoreData<PostsResponseType, PostType>(
+										authenticatedFetch,
+										posts,
+										setPosts
+									)
 								}}
 							/>
 						) : (

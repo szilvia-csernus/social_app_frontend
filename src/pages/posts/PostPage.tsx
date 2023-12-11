@@ -8,12 +8,15 @@ import { FC, useContext, useEffect, useState } from 'react';
 import PostDetail from './PostDetail';
 import { PostType, PostsResponseType } from './PostTypes';
 import Comment from '../comments/Comment';
-import { CommentsResponseType, CommentsType } from '../comments/CommentTypes';
+import { CommentType, CommentsResponseType} from '../comments/CommentTypes';
 import CreateCommentForm from '../comments/CreateCommentForm';
 import {
 	AuthenticatedFetchContext,
 	CurrentUserContext,
 } from '../../contexts/CurrentUserContext';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Asset from '../../components/Asset';
+import { fetchMoreData } from '../../utils/utils';
 
 const PostPage: FC = () => {
 	const { id } = useParams();
@@ -56,9 +59,11 @@ const PostPage: FC = () => {
 						responses[1].data &&
 						'results' in responses[1].data
 					) {
-						const commentsData = responses[1].data.results as CommentsType;
+						const commentsData = responses[1].data as CommentsResponseType;
 						setComments((prevState) => {
-							return { ...prevState, results: commentsData };
+							return { ...prevState,
+								next: commentsData.next,
+								results: commentsData.results };
 						});
 					}
 				}
@@ -103,14 +108,27 @@ const PostPage: FC = () => {
 								'Comments'
 							) : null}
 							{comments.results.length > 0 ? (
-								comments.results.map((comment) => (
-									<Comment
-										key={comment.id}
-										{...comment}
-										setPosts={setPosts}
-										setComments={setComments}
-									/>
-								))
+								<InfiniteScroll
+									children={comments.results.map((comment) => (
+										<Comment
+											key={comment.id}
+											{...comment}
+											setPosts={setPosts}
+											setComments={setComments}
+										/>
+									))}
+									dataLength={comments.results.length}
+									loader={<Asset spinner />}
+									hasMore={!!comments.next}
+									next={() => {
+										console.log('comment infinite scroll next function is being called.')
+										fetchMoreData<CommentsResponseType, CommentType>(
+											authenticatedFetch,
+											comments,
+											setComments
+										);
+									}}
+								/>
 							) : currentUser ? (
 								<span>No comments yet, be the first to comment!</span>
 							) : (

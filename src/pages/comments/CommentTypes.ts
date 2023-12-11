@@ -5,7 +5,9 @@ export type CommentType = {
 	post: number;
 	profile_id: number;
 	profile_image: string;
+	created_at: string;
 	updated_at: string;
+	is_owner: boolean;
 };
 
 export type CommentsType = CommentType[];

@@ -90,8 +90,12 @@ function PostCreateForm() {
 
 		formData.append('title', title);
 		formData.append('content', content);
-		if (imageInput.current && imageInput.current.files) {
-			formData.append('image', imageInput.current.files[0])
+		if (
+			imageInput.current &&
+			imageInput.current.files &&
+			imageInput.current.files.length > 0
+		) {
+			formData.append('image', imageInput.current.files[0]);
 		}
 
 		try {

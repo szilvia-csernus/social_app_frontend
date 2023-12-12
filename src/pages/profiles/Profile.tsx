@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { useContext } from 'react';
 import { Button } from 'react-bootstrap';
-import { SetProfileDataContext } from '../../contexts/ProfileDataContext';
+import { useHandleFollow } from '../../hooks/useProfileContext';
 
 type ProfilePropsType = {
     profile: ProfileType;
@@ -19,7 +19,7 @@ function Profile({profile, mobile, imageSize=55}: ProfilePropsType) {
 
     const currentUser = useContext(CurrentUserContext);
     const is_owner = currentUser?.username === owner;
-	const {handleFollow} = useContext(SetProfileDataContext)
+	const handleFollow = useHandleFollow();
 
   return (
 		<div

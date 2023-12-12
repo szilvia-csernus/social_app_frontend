@@ -13,20 +13,22 @@ import PopularProfiles from './PopularProfiles';
 import { AuthenticatedFetchContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { useParams } from 'react-router-dom';
 import { ProfileType } from './ProfileTypes';
-import { ProfileDataContext, SetProfileDataContext } from '../../contexts/ProfileDataContext';
+import { ProfileDataContext } from '../../contexts/ProfileDataContext';
 import { Image } from 'react-bootstrap';
 import { PostType, PostsResponseType } from '../posts/PostTypes';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PostDetail from '../posts/PostDetail';
 import { fetchMoreData } from '../../utils/utils';
 import NoResults from '../../assets/no-results.png';
+import { useSetProfileData, useHandleFollow } from '../../hooks/useProfileContext';
 
 function ProfilePage() {
 	const [hasLoaded, setHasLoaded] = useState(false);
 	const currentUser = useContext(CurrentUserContext);
     const authenticatedFetch = useContext(AuthenticatedFetchContext)
     const {id} = useParams();
-    const {setProfileData, handleFollow} = useContext(SetProfileDataContext);
+    const setProfileData = useSetProfileData();
+    const handleFollow = useHandleFollow();
     const profileData = useContext(ProfileDataContext)
     const { pageProfile } = profileData;
     const isOwner = currentUser?.username === pageProfile?.owner;

@@ -6,7 +6,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/Error.tsx';
 import SignUpForm from './auth/SignUpForm.tsx';
 import SignInForm from './auth/SignInForm.tsx';
-// import { CurrentUserProvider } from './contexts/CurrentUserContext';
 // import React from 'react';
 import CreatePostForm from './pages/posts/CreatePostForm.tsx';
 import PostPage from './pages/posts/PostPage.tsx';
@@ -14,6 +13,7 @@ import PostsPage from './pages/posts/PostsPage.tsx';
 import Modal from './components/Modal.tsx';
 import Spinner from './components/Spinner.tsx';
 import EditPostForm from './pages/posts/EditPostForm.tsx';
+import ProfilePage from './pages/profiles/ProfilePage.tsx';
 
 
 const router = createBrowserRouter([
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
 				path: 'posts/:id/edit',
 				element: <EditPostForm />,
 			},
-			{ path: 'profiles', element: 'Profiles page' },
+			{ path: 'profiles/:id', element: <ProfilePage />}
 		],
 	},
 ]);

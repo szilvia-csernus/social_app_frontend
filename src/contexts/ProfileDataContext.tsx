@@ -6,13 +6,13 @@ import {
 	useEffect,
     useState,
 } from 'react';
-import { PopularProfilesResponseType, ProfileDataType } from '../pages/profiles/ProfileTypes';
+import { ProfileDataType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
 import { AuthenticatedFetchContext, CurrentUserContext } from './CurrentUserContext';
 
 
 const initialProfileData: ProfileDataType = {
 	// we will use the pageProfile later!
-	pageProfile: {},
+	pageProfile: null,
 	popularProfiles: {
 		count: 0,
 		next: '',
@@ -24,6 +24,11 @@ const initialProfileData: ProfileDataType = {
 
 export const ProfileDataContext =
 	createContext<ProfileDataType>(initialProfileData);
+
+export const SetProfileDataContext = createContext<
+	React.Dispatch<React.SetStateAction<ProfileDataType>>
+>(() => {});
+
 
 
 export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
@@ -43,7 +48,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 					if (response && response.data) {
 						setProfileData((prevState: ProfileDataType) => ({
 							...prevState,
-							popularProfiles: response.data as PopularProfilesResponseType,
+							popularProfiles: response.data as ProfilesResponseType,
 						}));
 					}
 				} catch (err) {
@@ -55,10 +60,10 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 		}, [currentUser, authenticatedFetch]);
 
 	return (
-
-        <ProfileDataContext.Provider value={profileData}>		
-            {children}							
-        </ProfileDataContext.Provider>
-
+		<ProfileDataContext.Provider value={profileData}>
+			<SetProfileDataContext.Provider value={setProfileData}>
+				{children}
+			</SetProfileDataContext.Provider>
+		</ProfileDataContext.Provider>
 	);
 };

@@ -15,7 +15,7 @@ export type ProfileType = {
 
 export type ProfilesType = ProfileType[];
 
-export type PopularProfilesResponseType = {
+export type ProfilesResponseType = {
 	count: number;
 	next: string;
 	previous: string;
@@ -23,6 +23,6 @@ export type PopularProfilesResponseType = {
 };
 
 export type ProfileDataType = {
-    pageProfile: object;
-    popularProfiles: PopularProfilesResponseType;
-}
+	pageProfile: ProfileType | null;
+	popularProfiles: ProfilesResponseType;
+};

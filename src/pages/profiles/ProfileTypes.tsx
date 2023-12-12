@@ -7,7 +7,7 @@ export type ProfileType = {
 	content: string;
 	image: string;
     is_owner: boolean;
-	follow_id: number;
+	follow_id: number | null;
 	posts_count: number;
 	followers_count: number;
     following_count: number;

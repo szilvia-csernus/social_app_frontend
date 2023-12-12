@@ -2,6 +2,7 @@ import { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { PostType, PostsResponseType } from "../pages/posts/PostTypes";
 import { CommentType, CommentsResponseType } from "../pages/comments/CommentTypes";
+import { ProfileType } from "../pages/profiles/ProfileTypes";
 
 export type ResourceType = 
 	| PostsResponseType | CommentsResponseType;
@@ -41,3 +42,20 @@ export const fetchMoreData = async <T extends ResourceType, R extends ResultType
 		console.error(err);
 	}
 };
+
+export const followHelper = (profile: ProfileType, clickedProfile: ProfileType, follow_id: number) => {
+	return {
+			...profile,
+			followers_count:
+				profile.id === clickedProfile.id
+					? profile.followers_count + 1
+					: profile.followers_count,
+			follow_id:
+				profile.id === clickedProfile.id
+					? follow_id
+					: profile.follow_id,
+			following_count: profile.is_owner
+				? profile.following_count + 1
+				: profile?.following_count,
+		}
+}

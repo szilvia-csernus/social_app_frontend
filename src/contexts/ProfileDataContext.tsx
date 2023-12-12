@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
 import { AuthenticatedFetchContext, AuthenticatedPostContext, CurrentUserContext } from './CurrentUserContext';
+import { followHelper } from '../utils/utils';
 
 
 const initialProfileData: ProfileDataType = {
@@ -47,9 +48,28 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
         const handleFollow = async (clickedProfile: ProfileType) => {
             try {
-                await authenticatedPost('/follows/', {
+                const response = await authenticatedPost('/follows/', {
                     followed_user: clickedProfile.id
                 })
+                if (response && response.data) {
+
+                    setProfileData((prevState: ProfileDataType) => {
+                        if (prevState.pageProfile) {
+                            return {
+                                ...prevState,
+                                pageProfile:
+                                    followHelper(prevState.pageProfile, clickedProfile, response.data.id),
+                                popularProfiles: {
+                                    ...prevState.popularProfiles,
+                                    results: prevState.popularProfiles.results.map(profile =>
+                                        followHelper(profile, clickedProfile, response.data.id))
+                                }
+                            }
+                        } else {
+                            return prevState;
+                        }
+                    })
+                }
             } catch (err) {
                 console.log(err)
             }

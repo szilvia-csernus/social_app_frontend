@@ -26,7 +26,7 @@ function ProfilePage() {
 	const currentUser = useContext(CurrentUserContext);
     const authenticatedFetch = useContext(AuthenticatedFetchContext)
     const {id} = useParams();
-    const setProfileData = useContext(SetProfileDataContext);
+    const {setProfileData, handleFollow} = useContext(SetProfileDataContext);
     const profileData = useContext(ProfileDataContext)
     const { pageProfile } = profileData;
     const isOwner = currentUser?.username === pageProfile?.owner;
@@ -111,6 +111,7 @@ function ProfilePage() {
 				</Col>
 				<Col lg={3} className="text-lg-right">
 					{currentUser &&
+                        pageProfile &&
 						!isOwner &&
 						(pageProfile?.follow_id ? (
 							<button
@@ -122,9 +123,9 @@ function ProfilePage() {
 						) : (
 							<button
 								className={`${btnStyles.Button} ${btnStyles.Black}`}
-								onClick={() => []}
+								onClick={() => handleFollow(pageProfile)}
 							>
-								unfollow
+								follow
 							</button>
 						))}
 				</Col>

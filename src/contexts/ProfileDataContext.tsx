@@ -6,8 +6,8 @@ import {
 	useEffect,
     useState,
 } from 'react';
-import { ProfileDataType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
-import { AuthenticatedFetchContext, CurrentUserContext } from './CurrentUserContext';
+import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
+import { AuthenticatedFetchContext, AuthenticatedPostContext, CurrentUserContext } from './CurrentUserContext';
 
 
 const initialProfileData: ProfileDataType = {
@@ -25,9 +25,15 @@ const initialProfileData: ProfileDataType = {
 export const ProfileDataContext =
 	createContext<ProfileDataType>(initialProfileData);
 
-export const SetProfileDataContext = createContext<
-	React.Dispatch<React.SetStateAction<ProfileDataType>>
->(() => {});
+type SetProfileDataProps = {
+	setProfileData: React.Dispatch<React.SetStateAction<ProfileDataType>>;
+	handleFollow: (clickedProfile: ProfileType) => Promise<void>;
+};
+
+export const SetProfileDataContext = createContext<SetProfileDataProps>({
+	setProfileData: () => {},
+	handleFollow: async () => {},
+});
 
 
 
@@ -37,6 +43,17 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 		const authenticatedFetch = useContext(AuthenticatedFetchContext);
 		const currentUser = useContext(CurrentUserContext);
+        const authenticatedPost = useContext(AuthenticatedPostContext)
+
+        const handleFollow = async (clickedProfile: ProfileType) => {
+            try {
+                await authenticatedPost('/follows/', {
+                    followed_user: clickedProfile.id
+                })
+            } catch (err) {
+                console.log(err)
+            }
+        }
 
 		useEffect(() => {
 			const handleMount = async () => {
@@ -61,7 +78,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 	return (
 		<ProfileDataContext.Provider value={profileData}>
-			<SetProfileDataContext.Provider value={setProfileData}>
+			<SetProfileDataContext.Provider value={{setProfileData, handleFollow}}>
 				{children}
 			</SetProfileDataContext.Provider>
 		</ProfileDataContext.Provider>

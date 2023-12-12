@@ -20,7 +20,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PostDetail from '../posts/PostDetail';
 import { fetchMoreData } from '../../utils/utils';
 import NoResults from '../../assets/no-results.png';
-import { useSetProfileData, useHandleFollow } from '../../hooks/useProfileContext';
+import { useSetProfileData, useHandleFollow, useHandleUnfollow } from '../../hooks/useProfileContext';
 
 function ProfilePage() {
 	const [hasLoaded, setHasLoaded] = useState(false);
@@ -29,6 +29,7 @@ function ProfilePage() {
     const {id} = useParams();
     const setProfileData = useSetProfileData();
     const handleFollow = useHandleFollow();
+    const handleUnfollow = useHandleUnfollow();
     const profileData = useContext(ProfileDataContext)
     const { pageProfile } = profileData;
     const isOwner = currentUser?.username === pageProfile?.owner;
@@ -118,7 +119,7 @@ function ProfilePage() {
 						(pageProfile?.follow_id ? (
 							<button
 								className={`${btnStyles.Button} ${btnStyles.BlackOutline}`}
-								onClick={() => {}}
+								onClick={() => handleUnfollow(pageProfile)}
 							>
 								unfollow
 							</button>

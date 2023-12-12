@@ -7,8 +7,8 @@ import {
     useState,
 } from 'react';
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
-import { AuthenticatedFetchContext, AuthenticatedPostContext, CurrentUserContext } from './CurrentUserContext';
-import { followHelper } from '../utils/utils';
+import { AuthenticatedFetchContext, AuthenticatedPostContext, AuthenticatedDeleteContext, CurrentUserContext } from './CurrentUserContext';
+import { followHelper, unfollowHelper } from '../utils/utils';
 
 
 const initialProfileData: ProfileDataType = {
@@ -29,11 +29,13 @@ export const ProfileDataContext =
 type SetProfileDataProps = {
 	setProfileData: React.Dispatch<React.SetStateAction<ProfileDataType>>;
 	handleFollow: (clickedProfile: ProfileType) => Promise<void>;
+	handleUnfollow: (clickedProfile: ProfileType) => Promise<void>;
 };
 
 export const SetProfileDataContext = createContext<SetProfileDataProps>({
 	setProfileData: () => {},
 	handleFollow: async () => {},
+	handleUnfollow: async () => {}
 });
 
 
@@ -44,7 +46,8 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 		const authenticatedFetch = useContext(AuthenticatedFetchContext);
 		const currentUser = useContext(CurrentUserContext);
-        const authenticatedPost = useContext(AuthenticatedPostContext)
+        const authenticatedPost = useContext(AuthenticatedPostContext);
+        const authenticatedDelete = useContext(AuthenticatedDeleteContext);
 
         const handleFollow = async (clickedProfile: ProfileType) => {
             try {
@@ -75,6 +78,41 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
             }
         }
 
+        const handleUnfollow = async (clickedProfile: ProfileType) => {
+					try {
+						const response = await authenticatedDelete(
+							`/follows/${clickedProfile.follow_id}/`
+						);
+						if (response && response.status === 204) {
+							setProfileData((prevState: ProfileDataType) => {
+								if (prevState.pageProfile) {
+									return {
+										...prevState,
+										pageProfile: unfollowHelper(
+											prevState.pageProfile,
+											clickedProfile
+										),
+										popularProfiles: {
+											...prevState.popularProfiles,
+											results: prevState.popularProfiles.results.map(
+												(profile) =>
+													unfollowHelper(
+														profile,
+														clickedProfile
+													),
+											)
+										},
+									};
+								} else {
+									return prevState;
+								}
+							});
+						}
+					} catch (err) {
+						console.log(err);
+					}
+				};
+
 		useEffect(() => {
 			const handleMount = async () => {
 				try {
@@ -98,7 +136,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 	return (
 		<ProfileDataContext.Provider value={profileData}>
-			<SetProfileDataContext.Provider value={{setProfileData, handleFollow}}>
+			<SetProfileDataContext.Provider value={{setProfileData, handleFollow, handleUnfollow}}>
 				{children}
 			</SetProfileDataContext.Provider>
 		</ProfileDataContext.Provider>

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { useContext } from 'react';
 import { Button } from 'react-bootstrap';
-import { useHandleFollow } from '../../hooks/useProfileContext';
+import { useHandleFollow, useHandleUnfollow } from '../../hooks/useProfileContext';
 
 type ProfilePropsType = {
     profile: ProfileType;
@@ -20,6 +20,7 @@ function Profile({profile, mobile, imageSize=55}: ProfilePropsType) {
     const currentUser = useContext(CurrentUserContext);
     const is_owner = currentUser?.username === owner;
 	const handleFollow = useHandleFollow();
+	const handleUnfollow = useHandleUnfollow();
 
   return (
 		<div
@@ -44,7 +45,7 @@ function Profile({profile, mobile, imageSize=55}: ProfilePropsType) {
 					(follow_id ? (
 						<Button
 							className={`${btnStyles.Button} ${btnStyles.BlackOutline}`}
-							onClick={() => {}}
+							onClick={() => handleUnfollow(profile)}
 						>
 							unfollow
 						</Button>

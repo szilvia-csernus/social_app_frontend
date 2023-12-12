@@ -43,7 +43,11 @@ export const fetchMoreData = async <T extends ResourceType, R extends ResultType
 	}
 };
 
-export const followHelper = (profile: ProfileType, clickedProfile: ProfileType, follow_id: number) => {
+export const followHelper = (
+	profile: ProfileType,
+	clickedProfile: ProfileType,
+	follow_id: number
+) => {
 	return {
 			...profile,
 			followers_count:
@@ -59,3 +63,20 @@ export const followHelper = (profile: ProfileType, clickedProfile: ProfileType, 
 				: profile?.following_count,
 		}
 }
+
+export const unfollowHelper = (
+	profile: ProfileType,
+	clickedProfile: ProfileType
+) => {
+	return {
+		...profile,
+		followers_count:
+			profile.id === clickedProfile.id
+				? profile.followers_count - 1
+				: profile.followers_count,
+		follow_id: profile.id === clickedProfile.id ? null : profile.follow_id,
+		following_count: profile.is_owner
+			? profile.following_count - 1
+			: profile?.following_count,
+	};
+};

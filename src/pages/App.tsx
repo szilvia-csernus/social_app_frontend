@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
 import { Outlet } from 'react-router-dom';
 import { CurrentUserProvider } from '../contexts/CurrentUserContext';
+import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 
 
 function App() {
@@ -11,12 +12,14 @@ function App() {
 
 	return (
 		<CurrentUserProvider>
-			<Container>
-				<Header />
-				<Container className="Main">
-					<Outlet />
+			<ProfileDataProvider>
+				<Container>
+					<Header />
+					<Container className="Main">
+						<Outlet />
+					</Container>
 				</Container>
-			</Container>
+			</ProfileDataProvider>
 		</CurrentUserProvider>
 	);
 }

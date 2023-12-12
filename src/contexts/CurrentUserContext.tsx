@@ -1,7 +1,7 @@
 import React, {
 	FC,
 	MutableRefObject,
-	ReactNode,
+	PropsWithChildren,
 	createContext,
 	useCallback,
 	useMemo,
@@ -36,10 +36,6 @@ function isUserContextType(obj: any): obj is UserContextType {
 		typeof obj.profile_image === 'string'
 	);
 }
-
-type CurrentUserProviderProps = {
-	children: ReactNode;
-};
 
 type Action =
 	| { type: 'LOG_IN'; payload: { user: UserContextType } }
@@ -92,7 +88,7 @@ function currentUserReducer(
 	}
 }
 
-export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({
+export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	children,
 }) => {
 	console.log('CurrentUserProvider runs');

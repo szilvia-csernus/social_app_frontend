@@ -5,7 +5,6 @@ import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 
 import Asset from '../../components/Asset';
-
 import styles from './Profile.module.css';
 import btnStyles from '../../components/Button.module.css';
 
@@ -21,6 +20,7 @@ import PostDetail from '../posts/PostDetail';
 import { fetchMoreData } from '../../utils/utils';
 import NoResults from '../../assets/no-results.png';
 import { useSetProfileData, useHandleFollow, useHandleUnfollow } from '../../hooks/useProfileContext';
+import { ProfileEditDropdown } from '../../components/MoreDropdown';
 
 function ProfilePage() {
 	const [hasLoaded, setHasLoaded] = useState(false);
@@ -87,6 +87,7 @@ function ProfilePage() {
 
 	const mainProfile = (
 		<>
+			{pageProfile?.is_owner && <ProfileEditDropdown id={pageProfile?.id} />}
 			<Row className="px-3 text-center">
 				<Col lg={3} className="text-lg-left">
 					<Image
@@ -114,7 +115,7 @@ function ProfilePage() {
 				</Col>
 				<Col lg={3} className="text-lg-right">
 					{currentUser &&
-                        pageProfile &&
+						pageProfile &&
 						!isOwner &&
 						(pageProfile?.follow_id ? (
 							<button

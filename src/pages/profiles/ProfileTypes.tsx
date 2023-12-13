@@ -26,3 +26,24 @@ export type ProfileDataType = {
 	pageProfile: ProfileType | null;
 	popularProfiles: ProfilesResponseType;
 };
+
+export type ProfileErrorDataType = {
+	username?: string[];
+	password?: string[];
+	new_password1?: string[];
+	new_password2?: string[];
+	non_field_errors?: string[];
+	content?: string[];
+};
+
+export type EditProfileDataType = {
+	name: string;
+	content: string;
+	image: string;
+};
+
+export type EditProfileErrorDataType = {
+	name?: string[];
+	content?: string[];
+	image?: string[];
+};

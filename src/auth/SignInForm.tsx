@@ -9,7 +9,6 @@ import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FetchTokensContext } from '../contexts/CurrentUserContext';
-// import { axiosRes } from '../api/axiosDefaults';
 
 export type signinDataType = {
 	username: string,

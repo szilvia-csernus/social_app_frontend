@@ -131,7 +131,12 @@ const PostDetail: FC<PostDetailProps> = ({
 						</Link>
 						<div className="d-flex gap-1 align-items-center">
 							<span>{updated_at}</span>
-							{isPostOwner && postPage && <MoreDropdown handleEdit={handleEdit} handleDelete={handleDelete}/>}
+							{isPostOwner && postPage && (
+								<MoreDropdown
+									handleEdit={handleEdit}
+									handleDelete={handleDelete}
+								/>
+							)}
 						</div>
 					</div>
 				</Card.Body>
@@ -139,9 +144,7 @@ const PostDetail: FC<PostDetailProps> = ({
 					<Card.Img src={image} alt={title} />
 				</Link>
 				<Card.Body>
-					{title && (
-						<Card.Title className="text-center">{title}</Card.Title>
-					)}
+					{title && <Card.Title className="text-center">{title}</Card.Title>}
 					{content && <Card.Text>{content}</Card.Text>}
 					<div
 						className={`${styles.PostBar} d-flex gap-2 justify-content-center`}
@@ -170,9 +173,17 @@ const PostDetail: FC<PostDetailProps> = ({
 							</OverlayTrigger>
 						)}
 						{likes_count}
-						<Link to={`/posts/${id}`}>
-							<i className="far fa-comments" />
-						</Link>
+						{currentUser ? (
+							<Link to={`/posts/${id}`}></Link>
+						) : (
+							<OverlayTrigger
+								placement="top"
+								overlay={<Tooltip>Log in to comment!</Tooltip>}
+							>
+								<i className="far fa-comments" />
+							</OverlayTrigger>
+						)}
+
 						{comments_count}
 					</div>
 				</Card.Body>

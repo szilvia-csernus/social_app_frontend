@@ -7,7 +7,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import styles from './Comment.module.css';
 import btnStyles from '../../components/Button.module.css';
 import Avatar from '../../components/Avatar';
-import { AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { PostsResponseType } from '../posts/PostTypes';
 import { CommentType, CommentsResponseType } from './CommentTypes';
 
@@ -25,7 +25,7 @@ function CreateCommentForm(props: CreateCommentPropsType) {
 
 	const currentUser = useContext(CurrentUserContext);
 
-    const authenticatedPost = useContext(AuthenticatedPostContext);
+	const authAxios = useContext(AuthAxiosContext);
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setContent(event.target.value);
@@ -38,10 +38,10 @@ function CreateCommentForm(props: CreateCommentPropsType) {
 
         formData.append('content', content);
 		try {
-			const response = await authenticatedPost('/comments/', {
+			const response = await authAxios({ method: 'post', path: '/comments/', body: {
 				content,
 				post: postId
-			});
+			}});
             if (response && response.status === 201) {
 				console.log('create comment response', response)
                 setComments((prevComments: CommentsResponseType) => {

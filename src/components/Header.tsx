@@ -9,7 +9,7 @@ import styles from './Header.module.css';
 import { ReactNode, useContext } from 'react';
 import {
 	CurrentUserContext,
-	LogoutUserContext,
+	SetCurrentUserContext,
 } from '../contexts/CurrentUserContext';
 import Avatar from './Avatar';
 import axios from 'axios';
@@ -17,7 +17,7 @@ import useClickOutsideToggle from '../hooks/useClickOutsideToggle';
 
 function Header() {
 	const currentUser = useContext(CurrentUserContext);
-	const dispatch = useContext(LogoutUserContext)
+	const dispatch = useContext(SetCurrentUserContext)
 
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
 
@@ -90,9 +90,11 @@ function Header() {
 							alt="connect logo"
 						/>
 					</Link>
-					<NavLink to="/posts/create" className={styles.NavLink}>
-						<i className="far fa-plus-square"></i>Post
-					</NavLink>
+					{currentUser && (
+						<NavLink to="/posts/create" className={styles.NavLink}>
+							<i className="far fa-plus-square"></i>Post
+						</NavLink>
+					)}
 				</Navbar.Brand>
 				<Navbar.Toggle
 					className={styles.Toggler}

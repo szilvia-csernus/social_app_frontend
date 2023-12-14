@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 
 import styles from './Comment.module.css';
 import btnStyles from '../../components/Button.module.css';
-import { AuthenticatedMultipartPutContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext } from '../../contexts/CurrentUserContext';
 import { CommentsResponseType } from './CommentTypes';
 
 type EditCommentFormType = {
@@ -19,7 +19,7 @@ type EditCommentFormType = {
 function EditCommentForm(props: EditCommentFormType) {
 	const { id, content, setShowEditForm, setComments } = props;
 
-    const authenticatedMultipartPut = useContext(AuthenticatedMultipartPutContext)
+    const authAxios = useContext(AuthAxiosContext);
 
 	const [formContent, setFormContent] = useState(content);
 
@@ -30,9 +30,9 @@ function EditCommentForm(props: EditCommentFormType) {
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();
 		try {
-            await authenticatedMultipartPut(`/comments/${id}/`, {
+            await authAxios({ method: 'put', path: `/comments/${id}/`, body: {
 								content: formContent.trim(),
-			});
+			}});
 			setComments((prevComments: CommentsResponseType) => ({
 				...prevComments,
 				results: prevComments.results.map((comment) => {

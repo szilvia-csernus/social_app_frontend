@@ -17,8 +17,8 @@ export type UserContextType = {
 	pk: number;
 	username: string;
 	email: string;
-	first_name: string;
-	last_name: string;
+	name: string;
+	content: string;
 	profile_id: number;
 	profile_image: string;
 } | null;
@@ -39,7 +39,9 @@ function isUserContextType(obj: any): obj is UserContextType {
 
 type Action =
 	| { type: 'LOG_IN'; payload: { user: UserContextType } }
-	| { type: 'LOG_OUT' };
+	| { type: 'LOG_OUT' }
+	| { type: 'EDIT_USERNAME'; payload: { username: string }}
+	| { type: 'UPDATE_PROFILE'; payload: { name: string, content: string, profile_image: string}}
 
 const initialRefreshKey = localStorage.getItem('refresh') || '';
 
@@ -49,17 +51,30 @@ type PostResponseData = {
 	id: number;
 };
 
+type authAxiosPropsType = {
+		method?: 'get' | 'post' | 'put' | 'delete',
+		path: string,
+		body?: object | null,
+		// multipart: boolean = false
+	}
+
 
 export const CurrentUserContext =
 	createContext<UserContextType>(initialCurrentUser);
 export const FetchTokensContext = createContext<
 	(signinData: signinDataType) => void
 >(() => null);
+export const AuthAxiosContext = createContext<
+(props: authAxiosPropsType) => Promise<AxiosResponse<object> | null>
+>(() => Promise.resolve({} as AxiosResponse));
 export const AuthenticatedFetchContext = createContext<
 	(path: string) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
 export const AuthenticatedPostContext = createContext<
 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
+>(() => Promise.resolve({} as AxiosResponse));
+export const AuthenticatedPutContext = createContext<
+	(path: string, body: object) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
 export const AuthenticatedDeleteContext = createContext<
 	(path: string) => Promise<AxiosResponse<object> | null>
@@ -70,7 +85,7 @@ export const AuthenticatedMultipartPostContext = createContext<
 export const AuthenticatedMultipartPutContext = createContext<
 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
 >(() => Promise.resolve({} as AxiosResponse));
-export const LogoutUserContext = createContext<React.Dispatch<Action>>(
+export const SetCurrentUserContext = createContext<React.Dispatch<Action>>(
 	() => {}
 );
 
@@ -83,6 +98,26 @@ function currentUserReducer(
 			return action.payload.user;
 		case 'LOG_OUT':
 			return null;
+		case 'EDIT_USERNAME':
+			if (state) {
+				return {
+					...state,
+					username: action.payload.username,
+				}
+			} else {
+				return state
+			}
+		case 'UPDATE_PROFILE':
+			if (state) {
+				return {
+					...state,
+					name: action.payload.name,
+					content: action.payload.content,
+					profile_image: action.payload.content
+				}
+			} else {
+				return state
+			}
 		default:
 			return state;
 	}
@@ -131,7 +166,7 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 				localStorage.removeItem('refresh');
 				console.log('refresh key has been cleared from everywhere!!');
 				console.error(err);
-				navigate('signin');
+				// navigate('signin');
 				return null;
 			}
 		},
@@ -149,6 +184,82 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 			if (accessKeyData.status === 200) {
 				try {
 					const response = await axios.post(path, body, {
+						headers: {
+							Authorization: `Bearer ${accessKeyData.data.access}`,
+						},
+					});
+					return response;
+				} catch (err) {
+					console.error(err);
+					return null;
+				}
+			} else {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				navigate('signin');
+				return null;
+			}
+		} catch (err) {
+			dispatch({ type: 'LOG_OUT' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!');
+			console.error(err);
+			navigate('signin');
+			return null;
+		}
+	};
+
+	const authAxios = useCallback(async ({method, path, body=null}: authAxiosPropsType): Promise<AxiosResponse<object> | null> => {
+		try {
+			const accessKeyData = await axios.post('api/token/refresh/', {
+				refresh: refreshKey.current,
+			});
+			if (accessKeyData.status === 200) {
+				const config = {
+					headers: {
+						Authorization: `Bearer ${accessKeyData.data.access}`,
+					},
+				};
+				switch (method) {
+					case 'post':
+						return axios.post(path, body, config);
+					case 'put':
+						return axios.put(path, body, config);
+					case 'delete':
+						return axios.delete(path, config);
+					default:
+						return axios.get(path, config);
+				}
+				
+			} else {
+				dispatch({ type: 'LOG_OUT' });
+				localStorage.removeItem('refresh');
+				console.log('refresh key has been cleared from everywhere!!');
+				navigate('signin');
+				return null;
+			}
+		} catch (err) {
+			dispatch({ type: 'LOG_OUT' });
+			localStorage.removeItem('refresh');
+			console.log('refresh key has been cleared from everywhere!!');
+			console.error(err);
+			navigate('signin');
+			return null;
+		}
+	},[navigate]);
+
+	const authenticatedPut = async (
+		path: string,
+		body: object
+	): Promise<AxiosResponse<PostResponseData> | null> => {
+		try {
+			const accessKeyData = await axios.post('api/token/refresh/', {
+				refresh: refreshKey.current,
+			});
+			if (accessKeyData.status === 200) {
+				try {
+					const response = await axios.put(path, body, {
 						headers: {
 							Authorization: `Bearer ${accessKeyData.data.access}`,
 						},
@@ -329,22 +440,26 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 			<CurrentUserContext.Provider value={currentUser}>
 				<RefreshKeyContext.Provider value={refreshKey}>
 					<FetchTokensContext.Provider value={fetchAndSetTokens}>
+						<AuthAxiosContext.Provider value={authAxios}>
 						<AuthenticatedFetchContext.Provider value={authenticatedFetch}>
 							<AuthenticatedPostContext.Provider value={authenticatedPost}>
+							<AuthenticatedPutContext.Provider value={authenticatedPut}>
 								<AuthenticatedMultipartPostContext.Provider
 									value={authenticatedMultipartPost}>
 								<AuthenticatedMultipartPutContext.Provider
 									value={authenticatedMultipartPut}>
 									<AuthenticatedDeleteContext.Provider
 										value={authenticatedDelete}>
-										<LogoutUserContext.Provider value={dispatch}>
+										<SetCurrentUserContext.Provider value={dispatch}>
 											{children}
-										</LogoutUserContext.Provider>
+										</SetCurrentUserContext.Provider>
 									</AuthenticatedDeleteContext.Provider>
 								</AuthenticatedMultipartPutContext.Provider>
 								</AuthenticatedMultipartPostContext.Provider>
+							</AuthenticatedPutContext.Provider>
 							</AuthenticatedPostContext.Provider>
 						</AuthenticatedFetchContext.Provider>
+						</AuthAxiosContext.Provider>
 					</FetchTokensContext.Provider>
 				</RefreshKeyContext.Provider>
 			</CurrentUserContext.Provider>

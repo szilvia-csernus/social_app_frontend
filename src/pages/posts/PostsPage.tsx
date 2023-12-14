@@ -14,7 +14,7 @@ import {
 	CurrentUserContext,
 } from '../../contexts/CurrentUserContext';
 import PostDetail from './PostDetail';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { PostType, PostsResponseType } from './PostTypes';
 import NoResults from '../../assets/no-results.png';
 import { Container, Form } from 'react-bootstrap';
@@ -62,9 +62,12 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 
 		let response: AxiosResponse<object> | null;
 		const fetchPosts = async () => {
-			response = await authenticatedFetch(
-				`/posts/?${filter}search=${query}`
-			);
+			if (currentUser) {
+				response = await authenticatedFetch(`/posts/?${filter}search=${query}`);
+			} else {
+				response = await axios.get(`/posts/?search=${query}`);
+			}
+			
 			if (response && response.data) {
 				const responseData = response.data;
 					setPosts(responseData as SetStateAction<PostsResponseType>);

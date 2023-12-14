@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import styles from './MoreDropdown.module.css';
+import { useNavigate } from 'react-router-dom';
 
 type MoreDropdownProps = {
 	handleEdit: () => void;
@@ -47,3 +48,38 @@ export const MoreDropdown = ({ handleEdit, handleDelete }: MoreDropdownProps) =>
 		</Dropdown>
 	);
 };
+
+type ProfileEditDropdownPropsType =
+	{ id: number}
+
+
+export function ProfileEditDropdown({ id }:ProfileEditDropdownPropsType) {
+	const navigate = useNavigate();
+	return (
+		<Dropdown className={`ml-auto px-3 ${styles.Absolute}`} drop="start">
+			<Dropdown.Toggle as={ThreeDots} />
+			<Dropdown.Menu>
+				<Dropdown.Item
+					onClick={() => navigate(`/profiles/${id}/edit`)}
+					aria-label="edit-profile"
+				>
+					<i className="fas fa-edit" /> edit profile
+				</Dropdown.Item>
+				<Dropdown.Item
+					onClick={() => navigate(`/profiles/${id}/edit/username`)}
+					aria-label="edit-username"
+				>
+					<i className="far fa-id-card" />
+					change username
+				</Dropdown.Item>
+				<Dropdown.Item
+					onClick={() => navigate(`/profiles/${id}/edit/password`)}
+					aria-label="edit-password"
+				>
+					<i className="fas fa-key" />
+					change password
+				</Dropdown.Item>
+			</Dropdown.Menu>
+		</Dropdown>
+	);
+}

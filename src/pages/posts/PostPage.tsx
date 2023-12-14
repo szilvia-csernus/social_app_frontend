@@ -17,6 +17,8 @@ import {
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Asset from '../../components/Asset';
 import { fetchMoreData } from '../../utils/utils';
+import axios from 'axios';
+import PopularProfiles from '../profiles/PopularProfiles';
 
 const PostPage: FC = () => {
 	const { id } = useParams();
@@ -45,8 +47,8 @@ const PostPage: FC = () => {
 			try {
 				// Promise.all() returns an array of resolved data
 				const responses = await Promise.all([
-					authenticatedFetch(`/posts/${id}`),
-					authenticatedFetch(`/comments/?post=${id}`),
+					axios.get(`/posts/${id}`),
+					axios.get(`/comments/?post=${id}`),
 				]);
 				if (responses && responses.length > 0 && responses[0]) {
 					const postData = responses[0].data as PostType;
@@ -84,7 +86,7 @@ const PostPage: FC = () => {
 			{id && (
 				<Row className="h-100">
 					<Col className="py-2 p-0 p-lg-2" lg={8}>
-						<p>Popular profiles for mobile</p>
+						<PopularProfiles mobile />
 						{/* postPage will evaluate as truthy inside this PostPage component! */}
 						{
 							<PostDetail
@@ -121,7 +123,9 @@ const PostPage: FC = () => {
 									loader={<Asset spinner />}
 									hasMore={!!comments.next}
 									next={() => {
-										console.log('comment infinite scroll next function is being called.')
+										console.log(
+											'comment infinite scroll next function is being called.'
+										);
 										fetchMoreData<CommentsResponseType, CommentType>(
 											authenticatedFetch,
 											comments,
@@ -136,8 +140,8 @@ const PostPage: FC = () => {
 							)}
 						</Container>
 					</Col>
-					<Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
-						Popular profiles for desktop
+					<Col md={4} className="d-none d-lg-block p-0 p-lg-2">
+						<PopularProfiles />
 					</Col>
 				</Row>
 			)}

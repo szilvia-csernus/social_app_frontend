@@ -9,6 +9,7 @@ import {
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
 import { AuthenticatedFetchContext, AuthenticatedPostContext, AuthenticatedDeleteContext, CurrentUserContext } from './CurrentUserContext';
 import { followHelper, unfollowHelper } from '../utils/utils';
+import axios from 'axios';
 
 
 const initialProfileData: ProfileDataType = {
@@ -116,7 +117,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 		useEffect(() => {
 			const handleMount = async () => {
 				try {
-					const response = await authenticatedFetch(
+					const response = await axios.get(
 						'/profiles/?ordering=-followers_count'
 					);
 					console.log('popular profiles response: ', response);
@@ -132,7 +133,9 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 			};
 
 			handleMount();
-		}, [currentUser, authenticatedFetch]);
+		}, [
+            currentUser, 
+            authenticatedFetch]);
 
 	return (
 		<ProfileDataContext.Provider value={profileData}>

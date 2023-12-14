@@ -14,6 +14,9 @@ import Modal from './components/Modal.tsx';
 import Spinner from './components/Spinner.tsx';
 import EditPostForm from './pages/posts/EditPostForm.tsx';
 import ProfilePage from './pages/profiles/ProfilePage.tsx';
+import ProfileEditForm from './pages/profiles/ProfileEditForm.tsx';
+import UsernameForm from './pages/profiles/UsernameForm.tsx';
+import UserPasswordForm from './pages/profiles/UserPasswordForm.tsx';
 
 
 const router = createBrowserRouter([
@@ -51,7 +54,10 @@ const router = createBrowserRouter([
 				path: 'posts/:id/edit',
 				element: <EditPostForm />,
 			},
-			{ path: 'profiles/:id', element: <ProfilePage />}
+			{ path: 'profiles/:id', element: <ProfilePage />},
+			{ path: "/profiles/:id/edit/username", element: <UsernameForm />},
+			{ path: "/profiles/:id/edit/password", element: <UserPasswordForm />},
+			{ path: "/profiles/:id/edit", element: <ProfileEditForm />}
 		],
 	},
 ]);

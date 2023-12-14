@@ -9,7 +9,7 @@ import Row from 'react-bootstrap/Row';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-    AuthenticatedPutContext,
+    AuthAxiosContext,
     CurrentUserContext,
 	SetCurrentUserContext
 } from '../../contexts/CurrentUserContext';
@@ -27,7 +27,7 @@ const UsernameForm = () => {
 
 	const currentUser = useContext(CurrentUserContext);
 	const dispatch = useContext(SetCurrentUserContext);
-    const authenticatedPut = useContext(AuthenticatedPutContext);
+    const authAxios = useContext(AuthAxiosContext);
 
 	useEffect(() => {
 		if (currentUser && currentUser?.profile_id?.toString() === id) {
@@ -40,9 +40,9 @@ const UsernameForm = () => {
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();
 		try {
-			await authenticatedPut('/dj-rest-auth/user/', {
+			await authAxios({ method: 'put', path: '/dj-rest-auth/user/', body: {
 				username,
-			});
+			}});
 			dispatch({ type: 'EDIT_USERNAME', payload: {	username: username }});
 			navigate(-1);
 		} catch (err) {

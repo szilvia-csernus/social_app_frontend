@@ -11,7 +11,7 @@ import { type AxiosResponse } from 'axios';
 
 import Upload from '../../assets/upload.png';
 import Asset from '../../components/Asset';
-import { AuthenticatedFetchContext, AuthenticatedMultipartPutContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, AuthenticatedFetchContext } from '../../contexts/CurrentUserContext';
 
 import styles from './Post.module.css';
 import btnStyles from '../../components/Button.module.css';
@@ -22,6 +22,10 @@ type PostData = {
 	title: string;
 	content: string;
 	image: string;
+};
+
+type EditPostResponse = {
+	id: number;
 };
 
 interface AxiosError extends Error {
@@ -59,9 +63,7 @@ function EditPostForm() {
 		image: '',
 	});
 	
-	const authenticatedMultipartPut = useContext(
-		AuthenticatedMultipartPutContext
-	);
+	const authAxios = useContext(AuthAxiosContext);
 
     const authenticatedFetch = useContext(AuthenticatedFetchContext)
 
@@ -121,9 +123,10 @@ function EditPostForm() {
 		}
 
 		try {
-			const response = await authenticatedMultipartPut(`/posts/${id}/`, formData);
-			if (response) {
-				navigate(`/posts/${response.data.id}`, { state: { from: location } });
+			const response = await authAxios({method: 'put', path: `/posts/${id}/`, body: formData, multipart: true });
+			if (response && response.data) {
+				const responseData = response.data as EditPostResponse
+				navigate(`/posts/${responseData.id}`, { state: { from: location } });
 			}
 		} catch (err) {
 			const axiosError = err as AxiosError;

@@ -82,9 +82,9 @@ export const AuthenticatedFetchContext = createContext<
 // export const AuthenticatedMultipartPostContext = createContext<
 // 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
 // >(() => Promise.resolve({} as AxiosResponse));
-export const AuthenticatedMultipartPutContext = createContext<
-	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
->(() => Promise.resolve({} as AxiosResponse));
+// export const AuthenticatedMultipartPutContext = createContext<
+// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
+// >(() => Promise.resolve({} as AxiosResponse));
 export const SetCurrentUserContext = createContext<React.Dispatch<Action>>(
 	() => {}
 );
@@ -362,37 +362,37 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	// 	}
 	// };
 	
-	const authenticatedMultipartPut = async (
-		path: string,
-		body: object
-	): Promise<AxiosResponse<PostResponseData> | null> => {
-		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey.current,
-			});
-			if (accessKeyData.status === 200) {
-				return axios.put(path, body, {
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				});
-			} else {
-				dispatch({ type: 'LOG_OUT' });
-				localStorage.removeItem('refresh');
-				console.log('refresh key has been cleared from everywhere!!');
-				navigate('signin');
-				return null;
-			}
-		} catch (err) {
-			dispatch({ type: 'LOG_OUT' });
-			localStorage.removeItem('refresh');
-			console.log('refresh key has been cleared from everywhere!!');
-			console.error(err);
-			navigate('signin');
-			return null;
-		}
-	};
+	// const authenticatedMultipartPut = async (
+	// 	path: string,
+	// 	body: object
+	// ): Promise<AxiosResponse<PostResponseData> | null> => {
+	// 	try {
+	// 		const accessKeyData = await axios.post('api/token/refresh/', {
+	// 			refresh: refreshKey.current,
+	// 		});
+	// 		if (accessKeyData.status === 200) {
+	// 			return axios.put(path, body, {
+	// 				headers: {
+	// 					'Content-Type': 'multipart/form-data',
+	// 					Authorization: `Bearer ${accessKeyData.data.access}`,
+	// 				},
+	// 			});
+	// 		} else {
+	// 			dispatch({ type: 'LOG_OUT' });
+	// 			localStorage.removeItem('refresh');
+	// 			console.log('refresh key has been cleared from everywhere!!');
+	// 			navigate('signin');
+	// 			return null;
+	// 		}
+	// 	} catch (err) {
+	// 		dispatch({ type: 'LOG_OUT' });
+	// 		localStorage.removeItem('refresh');
+	// 		console.log('refresh key has been cleared from everywhere!!');
+	// 		console.error(err);
+	// 		navigate('signin');
+	// 		return null;
+	// 	}
+	// };
 
 	const fetchAndSetTokens = async (signinData: signinDataType) => {
 		const signinTokens = await axios.post('api/token/', signinData);
@@ -454,15 +454,15 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 							{/* <AuthenticatedPutContext.Provider value={authenticatedPut}> */}
 								{/* <AuthenticatedMultipartPostContext.Provider
 									value={authenticatedMultipartPost}> */}
-								<AuthenticatedMultipartPutContext.Provider
-									value={authenticatedMultipartPut}>
+								{/* <AuthenticatedMultipartPutContext.Provider
+									value={authenticatedMultipartPut}> */}
 									{/* <AuthenticatedDeleteContext.Provider
 										value={authenticatedDelete}> */}
 										<SetCurrentUserContext.Provider value={dispatch}>
 											{children}
 										</SetCurrentUserContext.Provider>
 									{/* </AuthenticatedDeleteContext.Provider> */}
-								</AuthenticatedMultipartPutContext.Provider>
+								{/* </AuthenticatedMultipartPutContext.Provider> */}
 								{/* </AuthenticatedMultipartPostContext.Provider> */}
 							{/* </AuthenticatedPutContext.Provider> */}
 							{/* </AuthenticatedPostContext.Provider> */}

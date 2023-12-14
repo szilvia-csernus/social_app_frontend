@@ -7,7 +7,7 @@ import {
     useState,
 } from 'react';
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
-import { AuthenticatedFetchContext, CurrentUserContext, AuthAxiosContext } from './CurrentUserContext';
+import { CurrentUserContext, AuthAxiosContext } from './CurrentUserContext';
 import { followHelper, unfollowHelper } from '../utils/utils';
 import axios, { AxiosResponse } from 'axios';
 
@@ -50,7 +50,6 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 	console.log('ProfileDataProvider runs');
 	const [profileData, setProfileData] = useState<ProfileDataType>(initialProfileData);
 
-		const authenticatedFetch = useContext(AuthenticatedFetchContext);
 		const currentUser = useContext(CurrentUserContext);
         const authAxios = useContext(AuthAxiosContext);
 
@@ -124,13 +123,9 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
                 let response: AxiosResponse<object> | null;
 				try {
                     if (currentUser) {
-                        response = await authenticatedFetch(
-													'/profiles/?ordering=-followers_count'
-												);
+                        response = await authAxios({ path: '/profiles/?ordering=-followers_count' });
                     } else {
-                        response = await axios.get(
-													'/profiles/?ordering=-followers_count'
-												);
+                        response = await axios.get('/profiles/?ordering=-followers_count');
                     }
 					console.log('popular profiles response: ', response);
 					if (response && response.data) {
@@ -146,7 +141,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 			};
 
 			handleMount();
-		}, [currentUser, authenticatedFetch]);
+		}, [currentUser, authAxios]);
 
 	return (
 		<ProfileDataContext.Provider value={profileData}>

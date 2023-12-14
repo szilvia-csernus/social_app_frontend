@@ -9,7 +9,7 @@ import styles from './Profile.module.css';
 import btnStyles from '../../components/Button.module.css';
 
 import PopularProfiles from './PopularProfiles';
-import { AuthenticatedFetchContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { useParams } from 'react-router-dom';
 import { ProfileType } from './ProfileTypes';
 import { ProfileDataContext } from '../../contexts/ProfileDataContext';
@@ -26,7 +26,7 @@ import axios, { AxiosResponse } from 'axios';
 function ProfilePage() {
 	const [hasLoaded, setHasLoaded] = useState(false);
 	const currentUser = useContext(CurrentUserContext);
-    const authenticatedFetch = useContext(AuthenticatedFetchContext)
+    const authAxios = useContext(AuthAxiosContext);
     const {id} = useParams();
     const setProfileData = useSetProfileData();
     const handleFollow = useHandleFollow();
@@ -51,8 +51,8 @@ function ProfilePage() {
                 // Promise.all() returns an array of resolved data
                 if (currentUser) {
                     responses = await Promise.all([
-											authenticatedFetch(`/profiles/${id}`),
-											authenticatedFetch(`/posts/?owner__profile=${id}`),
+											authAxios({path: `/profiles/${id}`}),
+											authAxios({path: `/posts/?owner__profile=${id}`}),
 										]);
                 } else {
                     responses = await Promise.all([
@@ -91,7 +91,7 @@ function ProfilePage() {
             }
         }
         fetchData();
-	}, [id, currentUser, setProfileData, authenticatedFetch]);
+	}, [id, currentUser, setProfileData, authAxios]);
 
     
 
@@ -178,8 +178,10 @@ function ProfilePage() {
 					loader={<Asset spinner />}
 					hasMore={!!profilePosts.next}
 					next={() => {
+                        const isLoggedIn = currentUser ? true : false;
 						fetchMoreData<PostsResponseType, PostType>(
-							authenticatedFetch,
+							authAxios,
+                            isLoggedIn,
 							profilePosts,
 							setProfilePosts
 						);

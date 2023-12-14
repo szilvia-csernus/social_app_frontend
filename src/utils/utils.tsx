@@ -1,8 +1,9 @@
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { PostType, PostsResponseType } from "../pages/posts/PostTypes";
 import { CommentType, CommentsResponseType } from "../pages/comments/CommentTypes";
 import { ProfileType } from "../pages/profiles/ProfileTypes";
+import { AuthAxiosPropsType } from "../contexts/CurrentUserContext";
 
 export type ResourceType = 
 	| PostsResponseType | CommentsResponseType;
@@ -11,13 +12,19 @@ type ResultType =
 	| PostType | CommentType;
 
 
-export const fetchMoreData = async <T extends ResourceType, R extends ResultType> (
-	fetchFunction: (path: string) => Promise<AxiosResponse<object> | null>,
+export const fetchMoreData = async <T extends ResourceType, R extends ResultType>(
+	fetchFunction: ({path}: AuthAxiosPropsType) => Promise<AxiosResponse<object> | null>,
+	isLoggedIn: boolean,
 	resource: T,
 	setResource: Dispatch<SetStateAction<T>>
 ) => {
 	try {
-		const response = await fetchFunction(resource.next);
+		let response: AxiosResponse<object> | null;
+		if (isLoggedIn) {
+			response = await fetchFunction({ path: resource.next});
+		} else {
+			response = await axios.get(resource.next);
+		}
 		if (response) {
 			const { data } = response;
 			setResource((prevResource: T) => {

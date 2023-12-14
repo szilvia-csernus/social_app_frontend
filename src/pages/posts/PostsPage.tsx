@@ -10,7 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './Post.module.css';
 import { useLocation } from 'react-router-dom';
 import {
-	AuthenticatedFetchContext,
+	AuthAxiosContext,
 	CurrentUserContext,
 } from '../../contexts/CurrentUserContext';
 import PostDetail from './PostDetail';
@@ -28,7 +28,7 @@ type PostsProps = {
 
 const PostsPage: FC<PostsProps> = ({ message }) => {
 	const currentUser = useContext(CurrentUserContext);
-	const authenticatedFetch = useContext(AuthenticatedFetchContext)
+	const authAxios = useContext(AuthAxiosContext)
 
 	const [posts, setPosts] = useState<PostsResponseType>({
 		count: 0,
@@ -63,7 +63,7 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 		let response: AxiosResponse<object> | null;
 		const fetchPosts = async () => {
 			if (currentUser) {
-				response = await authenticatedFetch(`/posts/?${filter}search=${query}`);
+				response = await authAxios({ path: `/posts/?${filter}search=${query}` });
 			} else {
 				response = await axios.get(`/posts/?search=${query}`);
 			}
@@ -86,7 +86,7 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 		return () => {
 			clearTimeout(timer)
 		}
-	}, [currentUser, pathname, query, authenticatedFetch]);
+	}, [currentUser, pathname, query, authAxios]);
 
 	return (
 		<Row className="h-100">
@@ -121,8 +121,10 @@ const PostsPage: FC<PostsProps> = ({ message }) => {
 								loader={<Asset spinner />}
 								hasMore={!!posts.next}
 								next={() => {
+									const isLoggedIn = currentUser ? true : false;
 									fetchMoreData<PostsResponseType, PostType>(
-										authenticatedFetch,
+										authAxios,
+										isLoggedIn,
 										posts,
 										setPosts
 									)

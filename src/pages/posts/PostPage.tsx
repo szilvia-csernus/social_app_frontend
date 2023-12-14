@@ -11,7 +11,7 @@ import Comment from '../comments/Comment';
 import { CommentType, CommentsResponseType} from '../comments/CommentTypes';
 import CreateCommentForm from '../comments/CreateCommentForm';
 import {
-	AuthenticatedFetchContext,
+	AuthAxiosContext,
 	CurrentUserContext,
 } from '../../contexts/CurrentUserContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -40,7 +40,7 @@ const PostPage: FC = () => {
 		results: [],
 	});
 
-	const authenticatedFetch = useContext(AuthenticatedFetchContext);
+	const authAxios = useContext(AuthAxiosContext);
 
 	useEffect(() => {
 		const handleMount = async () => {
@@ -79,7 +79,7 @@ const PostPage: FC = () => {
 		};
 
 		handleMount();
-	}, [id, authenticatedFetch]);
+	}, [id, authAxios]);
 
 	return (
 		<>
@@ -126,11 +126,13 @@ const PostPage: FC = () => {
 										console.log(
 											'comment infinite scroll next function is being called.'
 										);
+										const isLoggedIn = currentUser ? true : false;
 										fetchMoreData<CommentsResponseType, CommentType>(
-											authenticatedFetch,
+											authAxios,
+											isLoggedIn,
 											comments,
 											setComments
-										);
+									);
 									}}
 								/>
 							) : currentUser ? (

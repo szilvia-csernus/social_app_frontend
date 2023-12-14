@@ -11,7 +11,7 @@ import { type AxiosResponse } from 'axios';
 
 import Upload from '../../assets/upload.png';
 import Asset from '../../components/Asset';
-import { AuthAxiosContext, AuthenticatedFetchContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext } from '../../contexts/CurrentUserContext';
 
 import styles from './Post.module.css';
 import btnStyles from '../../components/Button.module.css';
@@ -65,8 +65,6 @@ function EditPostForm() {
 	
 	const authAxios = useContext(AuthAxiosContext);
 
-    const authenticatedFetch = useContext(AuthenticatedFetchContext)
-
 	const { title, content, image } = postData;
 
 	const imageInput = useRef<HTMLInputElement | null>(null);
@@ -79,7 +77,7 @@ function EditPostForm() {
         const HandleMount = async () => {
 
             console.log("location: ", id)
-            const response = (await authenticatedFetch(`/posts/${id}/`))
+            const response = (await authAxios({ path: `/posts/${id}/` }))
             if (response && response.data) {
                 const responseData = response.data;
                 if (isEditPostResponseType(responseData)) {
@@ -93,7 +91,7 @@ function EditPostForm() {
         }
 
         HandleMount();
-    }, [authenticatedFetch, location, navigate, id])
+    }, [authAxios, location, navigate, id])
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setPostData({

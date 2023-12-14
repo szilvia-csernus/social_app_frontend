@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { AuthenticatedDeleteContext, AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
@@ -35,7 +35,7 @@ const PostDetail: FC<PostDetailProps> = ({
     
 	const currentUser = useContext(CurrentUserContext)
 	const authenticatedPost = useContext(AuthenticatedPostContext);
-	const authenticatedDelete = useContext(AuthenticatedDeleteContext);
+	const authAxios = useContext(AuthAxiosContext);
 	const [isPostOwner, setIsPostOwner] = useState<boolean>(false);
 
 	const navigate = useNavigate();
@@ -53,7 +53,7 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	const handleDelete = async () => {
 		try {
-			await authenticatedDelete(`/posts/${id}`);
+			await authAxios({ method: 'delete', path: `/posts/${id}`});
 			setPosts((prevPosts: PostsResponseType) => {
 				const updatedResults = prevPosts.results.filter((post) => post.id !== id);
 				return {
@@ -98,7 +98,7 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	const handleUnLike = async () => {
 		try {
-			await authenticatedDelete(`/likes/${like_id}`);
+			await authAxios({ method: 'delete', path: `/likes/${like_id}` });
 			setPosts((prevPosts: PostsResponseType) => {
 				const indx = prevPosts.results.findIndex((post) => post.id === id);
 				const updatedResults = [...prevPosts.results];
@@ -174,7 +174,9 @@ const PostDetail: FC<PostDetailProps> = ({
 						)}
 						{likes_count}
 						{currentUser ? (
-							<Link to={`/posts/${id}`}></Link>
+							<Link to={`/posts/${id}`}>
+								<i className="far fa-comments" />
+							</Link>
 						) : (
 							<OverlayTrigger
 								placement="top"

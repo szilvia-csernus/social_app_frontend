@@ -88,37 +88,37 @@ function ProfilePage() {
 
 	const mainProfile = (
 		<>
-			{pageProfile?.is_owner && <ProfileEditDropdown id={pageProfile?.id} />}
+        {pageProfile && isOwner && <ProfileEditDropdown id={pageProfile.id} />}
+        {pageProfile ? (
 			<Row className="px-3 text-center">
 				<Col lg={3} className="text-lg-left">
 					<Image
 						className={styles.ProfileImage}
 						roundedCircle
-						src={pageProfile?.image}
+						src={pageProfile.image}
 					/>
 				</Col>
 				<Col lg={6}>
-					<h3 className="m-2">{pageProfile?.owner}</h3>
+					<h3 className="m-2">{pageProfile.owner}</h3>
 					<Row className="justify-content-center no-gutters">
 						<Col xs={3} className={'my-2'}>
-							<div>{pageProfile?.posts_count}</div>
+							<div>{pageProfile.posts_count}</div>
 							<div>posts</div>
 						</Col>
 						<Col xs={3} className={'my-2'}>
-							<div>{pageProfile?.followers_count}</div>
+							<div>{pageProfile.followers_count}</div>
 							<div>followers</div>
 						</Col>
 						<Col xs={3} className={'my-2'}>
-							<div>{pageProfile?.following_count}</div>
+							<div>{pageProfile.following_count}</div>
 							<div>following</div>
 						</Col>
 					</Row>
 				</Col>
 				<Col lg={3} className="text-lg-right">
 					{currentUser &&
-						pageProfile &&
 						!isOwner &&
-						(pageProfile?.follow_id ? (
+						(pageProfile.follow_id ? (
 							<button
 								className={`${btnStyles.Button} ${btnStyles.BlackOutline}`}
 								onClick={() => handleUnfollow(pageProfile)}
@@ -136,11 +136,16 @@ function ProfilePage() {
 				</Col>
 				<Col className="p-3">Profile content</Col>
 			</Row>
+            ): (
+                <Row>Profile not found.</Row>
+            )}
 		</>
 	);
 
 	const mainProfilePosts = (
 		<>
+        {pageProfile && (
+            <>
 			<hr />
 			{profilePosts.results.length ? (
 				<InfiniteScroll
@@ -167,11 +172,13 @@ function ProfilePage() {
 				<Container className="Content">
 					<Asset
 						src={NoResults}
-						message={`No results found, ${pageProfile?.owner} hasn't posted yet.`}
+						message={`No results found, ${pageProfile.owner} hasn't posted yet.`}
 					/>
 				</Container>
 			)}
 			<hr />
+            </>
+            )}
 		</>
 	);
 

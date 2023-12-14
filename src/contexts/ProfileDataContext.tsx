@@ -7,7 +7,7 @@ import {
     useState,
 } from 'react';
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
-import { AuthenticatedFetchContext, AuthenticatedPostContext, AuthenticatedDeleteContext, CurrentUserContext } from './CurrentUserContext';
+import { AuthenticatedFetchContext, AuthenticatedPostContext, CurrentUserContext, AuthAxiosContext } from './CurrentUserContext';
 import { followHelper, unfollowHelper } from '../utils/utils';
 import axios from 'axios';
 
@@ -48,7 +48,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 		const authenticatedFetch = useContext(AuthenticatedFetchContext);
 		const currentUser = useContext(CurrentUserContext);
         const authenticatedPost = useContext(AuthenticatedPostContext);
-        const authenticatedDelete = useContext(AuthenticatedDeleteContext);
+        const authAxios = useContext(AuthAxiosContext);
 
         const handleFollow = async (clickedProfile: ProfileType) => {
             try {
@@ -81,9 +81,9 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
         const handleUnfollow = async (clickedProfile: ProfileType) => {
 					try {
-						const response = await authenticatedDelete(
-							`/follows/${clickedProfile.follow_id}/`
-						);
+						const response = await authAxios({ method: 'delete',
+							path: `/follows/${clickedProfile.follow_id}/`
+                    });
 						if (response && response.status === 204) {
 							setProfileData((prevState: ProfileDataType) => {
 								if (prevState.pageProfile) {

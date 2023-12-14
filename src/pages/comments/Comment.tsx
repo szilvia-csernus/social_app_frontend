@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import { CommentType, CommentsResponseType } from './CommentTypes';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
-import { AuthenticatedDeleteContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { MoreDropdown } from '../../components/MoreDropdown';
 import { PostsResponseType } from '../posts/PostTypes';
 import EditCommentForm from './EditCommentForm';
@@ -17,7 +17,7 @@ type CommentPropsType = CommentType & {
 function Comment({id, profile_id, profile_image, owner, updated_at, content, setPosts, setComments}: CommentPropsType) {
     const currentUser = useContext(CurrentUserContext);
     const isCommentOwner = currentUser ? currentUser.username === owner : false;
-    const authenticatedDelete = useContext(AuthenticatedDeleteContext);
+    const authAxios = useContext(AuthAxiosContext);
 
     const [showEditForm, setShowEditForm] = useState(false);
 
@@ -27,7 +27,7 @@ function Comment({id, profile_id, profile_image, owner, updated_at, content, set
 
     const handleDelete = async () => {
         try {
-            await authenticatedDelete(`/comments/${id}`);
+            await authAxios({ method: 'delete', path: `/comments/${id}`});
             setPosts((prevPosts: PostsResponseType) => {
                 const newCommentsCount = prevPosts.results[0].comments_count - 1
                     return {

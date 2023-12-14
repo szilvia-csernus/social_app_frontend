@@ -55,7 +55,7 @@ type authAxiosPropsType = {
 		method?: 'get' | 'post' | 'put' | 'delete',
 		path: string,
 		body?: object | null,
-		// multipart: boolean = false
+		multipart?: boolean
 	}
 
 
@@ -79,9 +79,9 @@ export const AuthenticatedFetchContext = createContext<
 // export const AuthenticatedDeleteContext = createContext<
 // 	(path: string) => Promise<AxiosResponse<object> | null>
 // >(() => Promise.resolve({} as AxiosResponse));
-export const AuthenticatedMultipartPostContext = createContext<
-	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
->(() => Promise.resolve({} as AxiosResponse));
+// export const AuthenticatedMultipartPostContext = createContext<
+// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
+// >(() => Promise.resolve({} as AxiosResponse));
 export const AuthenticatedMultipartPutContext = createContext<
 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
 >(() => Promise.resolve({} as AxiosResponse));
@@ -210,17 +210,25 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	// 	}
 	// };
 
-	const authAxios = useCallback(async ({method, path, body=null}: authAxiosPropsType): Promise<AxiosResponse<object> | null> => {
+	const authAxios = useCallback(async ({method, path, body=null, multipart=false}: authAxiosPropsType): Promise<AxiosResponse<object> | null> => {
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
 				refresh: refreshKey.current,
 			});
 			if (accessKeyData.status === 200) {
-				const config = {
+				const config: {
+					headers: {
+						Authorization: string;
+						'Content-Type'?: string;
+					}
+				} = {
 					headers: {
 						Authorization: `Bearer ${accessKeyData.data.access}`,
 					},
 				};
+				if (multipart) {
+					config.headers['Content-Type'] = 'multipart/form-data'
+				}
 				switch (method) {
 					case 'post':
 						return axios.post(path, body, config);
@@ -322,37 +330,37 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	// 	}
 	// };
 
-	const authenticatedMultipartPost = async (
-		path: string,
-		body: object
-	): Promise<AxiosResponse<PostResponseData> | null> => {
-		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey.current,
-			});
-			if (accessKeyData.status === 200) {
-				return axios.post(path, body, {
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				});
-			} else {
-				dispatch({ type: 'LOG_OUT' });
-				localStorage.removeItem('refresh');
-				console.log('refresh key has been cleared from everywhere!!');
-				navigate('signin');
-				return null;
-			}
-		} catch (err) {
-			dispatch({ type: 'LOG_OUT' });
-			localStorage.removeItem('refresh');
-			console.log('refresh key has been cleared from everywhere!!');
-			console.error(err);
-			navigate('signin');
-			return null;
-		}
-	};
+	// const authenticatedMultipartPost = async (
+	// 	path: string,
+	// 	body: object
+	// ): Promise<AxiosResponse<PostResponseData> | null> => {
+	// 	try {
+	// 		const accessKeyData = await axios.post('api/token/refresh/', {
+	// 			refresh: refreshKey.current,
+	// 		});
+	// 		if (accessKeyData.status === 200) {
+	// 			return axios.post(path, body, {
+	// 				headers: {
+	// 					'Content-Type': 'multipart/form-data',
+	// 					Authorization: `Bearer ${accessKeyData.data.access}`,
+	// 				},
+	// 			});
+	// 		} else {
+	// 			dispatch({ type: 'LOG_OUT' });
+	// 			localStorage.removeItem('refresh');
+	// 			console.log('refresh key has been cleared from everywhere!!');
+	// 			navigate('signin');
+	// 			return null;
+	// 		}
+	// 	} catch (err) {
+	// 		dispatch({ type: 'LOG_OUT' });
+	// 		localStorage.removeItem('refresh');
+	// 		console.log('refresh key has been cleared from everywhere!!');
+	// 		console.error(err);
+	// 		navigate('signin');
+	// 		return null;
+	// 	}
+	// };
 	
 	const authenticatedMultipartPut = async (
 		path: string,
@@ -444,8 +452,8 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 						<AuthenticatedFetchContext.Provider value={authenticatedFetch}>
 							{/* <AuthenticatedPostContext.Provider value={authenticatedPost}> */}
 							{/* <AuthenticatedPutContext.Provider value={authenticatedPut}> */}
-								<AuthenticatedMultipartPostContext.Provider
-									value={authenticatedMultipartPost}>
+								{/* <AuthenticatedMultipartPostContext.Provider
+									value={authenticatedMultipartPost}> */}
 								<AuthenticatedMultipartPutContext.Provider
 									value={authenticatedMultipartPut}>
 									{/* <AuthenticatedDeleteContext.Provider
@@ -455,7 +463,7 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 										</SetCurrentUserContext.Provider>
 									{/* </AuthenticatedDeleteContext.Provider> */}
 								</AuthenticatedMultipartPutContext.Provider>
-								</AuthenticatedMultipartPostContext.Provider>
+								{/* </AuthenticatedMultipartPostContext.Provider> */}
 							{/* </AuthenticatedPutContext.Provider> */}
 							{/* </AuthenticatedPostContext.Provider> */}
 						</AuthenticatedFetchContext.Provider>

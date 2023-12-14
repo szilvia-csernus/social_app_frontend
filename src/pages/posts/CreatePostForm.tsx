@@ -15,7 +15,8 @@ import Asset from '../../components/Asset';
 import { Alert, Image } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { type AxiosResponse } from 'axios';
-import { AuthenticatedMultipartPostContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext} from '../../contexts/CurrentUserContext';
+import { PostType } from './PostTypes';
 
 
 type PostData = {
@@ -42,9 +43,9 @@ type errorDataType =
 	| undefined;
 
 type PostError = {
-	title?: string[] | undefined;
-	content?: string[] | undefined;
-	image?: string[] | undefined;
+	title?: string[];
+	content?: string[];
+	image?: string[];
 };
 
 interface PostErrorResponse extends AxiosResponse {
@@ -58,7 +59,7 @@ function PostCreateForm() {
 		content: '',
 		image: '',
 	});
-	const authenticatedMultipartPost = useContext(AuthenticatedMultipartPostContext)
+	const authAxios = useContext(AuthAxiosContext);
 
 	const { title, content, image } = postData;
 
@@ -99,9 +100,11 @@ function PostCreateForm() {
 		}
 
 		try {
-			const response = await authenticatedMultipartPost('/posts/', formData);
-			if (response) {
-				navigate(`/posts/${response.data.id}`, { state: { from: location } });
+			const response = await authAxios({ method: 'post', path: '/posts/', body: formData, multipart: true });
+			if (response && response.data) {
+				console.log('create post response: ', response)
+				const responseData = response.data as PostType
+				navigate(`/posts/${responseData.id}`, { state: { from: location } });
 			}
 		} catch (err) {
 			const axiosError = err as AxiosError;

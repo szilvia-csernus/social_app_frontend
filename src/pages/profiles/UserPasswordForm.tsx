@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 
 import btnStyles from '../../components/Button.module.css';
 import { AxiosError } from 'axios';
@@ -18,7 +18,7 @@ const UserPasswordForm = () => {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const currentUser = useContext(CurrentUserContext);
-    const authenticatedPost = useContext(AuthenticatedPostContext)
+    const authAxios = useContext(AuthAxiosContext)
 
 	const [userData, setUserData] = useState({
 		new_password1: '',
@@ -45,7 +45,7 @@ const UserPasswordForm = () => {
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();
 		try {
-			await authenticatedPost('/dj-rest-auth/password/change/', userData);
+			await authAxios({ method: 'post', path: '/dj-rest-auth/password/change/', body: userData });
 			navigate(-1);
 		} catch (err) {
 			const axiosError = err as AxiosError;

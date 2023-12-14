@@ -21,7 +21,7 @@ import { fetchMoreData } from '../../utils/utils';
 import NoResults from '../../assets/no-results.png';
 import { useSetProfileData, useHandleFollow, useHandleUnfollow } from '../../hooks/useProfileContext';
 import { ProfileEditDropdown } from '../../components/MoreDropdown';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 function ProfilePage() {
 	const [hasLoaded, setHasLoaded] = useState(false);
@@ -47,11 +47,20 @@ function ProfilePage() {
         const fetchData = async () => {
 
             try {
+                let responses: Array<AxiosResponse<object> | null>;
                 // Promise.all() returns an array of resolved data
-                const responses = await Promise.all([
-									axios.get(`/profiles/${id}`),
-									axios.get(`/posts/?owner__profile=${id}`),
-								]);
+                if (currentUser) {
+                    responses = await Promise.all([
+											authenticatedFetch(`/profiles/${id}`),
+											authenticatedFetch(`/posts/?owner__profile=${id}`),
+										]);
+                } else {
+                    responses = await Promise.all([
+											axios.get(`/profiles/${id}`),
+											axios.get(`/posts/?owner__profile=${id}`),
+										]);
+                }
+                
                 if (responses && responses.length > 0 && responses[0]) {
                     const profileDataResponse = responses[0].data as ProfileType;
 
@@ -82,7 +91,7 @@ function ProfilePage() {
             }
         }
         fetchData();
-	}, [id, setProfileData, authenticatedFetch]);
+	}, [id, currentUser, setProfileData, authenticatedFetch]);
 
     
 

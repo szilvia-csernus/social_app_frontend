@@ -7,9 +7,9 @@ import {
     useState,
 } from 'react';
 import { ProfileDataType, ProfileType, ProfilesResponseType } from '../pages/profiles/ProfileTypes';
-import { AuthenticatedFetchContext, AuthenticatedPostContext, CurrentUserContext, AuthAxiosContext } from './CurrentUserContext';
+import { AuthenticatedFetchContext, CurrentUserContext, AuthAxiosContext } from './CurrentUserContext';
 import { followHelper, unfollowHelper } from '../utils/utils';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 
 const initialProfileData: ProfileDataType = {
@@ -23,7 +23,6 @@ const initialProfileData: ProfileDataType = {
 	},
 };
 
-
 export const ProfileDataContext =
 	createContext<ProfileDataType>(initialProfileData);
 
@@ -32,6 +31,12 @@ type SetProfileDataProps = {
 	handleFollow: (clickedProfile: ProfileType) => Promise<void>;
 	handleUnfollow: (clickedProfile: ProfileType) => Promise<void>;
 };
+
+type FollowResponseType = {
+    id: number;
+    followed_user: number;
+    owner: string;
+}
 
 export const SetProfileDataContext = createContext<SetProfileDataProps>({
 	setProfileData: () => {},
@@ -47,26 +52,26 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 		const authenticatedFetch = useContext(AuthenticatedFetchContext);
 		const currentUser = useContext(CurrentUserContext);
-        const authenticatedPost = useContext(AuthenticatedPostContext);
         const authAxios = useContext(AuthAxiosContext);
 
         const handleFollow = async (clickedProfile: ProfileType) => {
             try {
-                const response = await authenticatedPost('/follows/', {
+                const response = await authAxios({ method: 'post', path: '/follows/', body: {
                     followed_user: clickedProfile.id
-                })
+            }})
                 if (response && response.data) {
-
+                    console.log('follow response: ', response)
+                    const responseData = response.data as FollowResponseType
                     setProfileData((prevState: ProfileDataType) => {
                         if (prevState.pageProfile) {
                             return {
                                 ...prevState,
                                 pageProfile:
-                                    followHelper(prevState.pageProfile, clickedProfile, response.data.id),
+                                    followHelper(prevState.pageProfile, clickedProfile, responseData.id),
                                 popularProfiles: {
                                     ...prevState.popularProfiles,
                                     results: prevState.popularProfiles.results.map(profile =>
-                                        followHelper(profile, clickedProfile, response.data.id))
+                                        followHelper(profile, clickedProfile, responseData.id))
                                 }
                             }
                         } else {
@@ -116,15 +121,23 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 
 		useEffect(() => {
 			const handleMount = async () => {
+                let response: AxiosResponse<object> | null;
 				try {
-					const response = await axios.get(
-						'/profiles/?ordering=-followers_count'
-					);
+                    if (currentUser) {
+                        response = await authenticatedFetch(
+													'/profiles/?ordering=-followers_count'
+												);
+                    } else {
+                        response = await axios.get(
+													'/profiles/?ordering=-followers_count'
+												);
+                    }
 					console.log('popular profiles response: ', response);
 					if (response && response.data) {
+                        const responseData = response.data as ProfilesResponseType
 						setProfileData((prevState: ProfileDataType) => ({
 							...prevState,
-							popularProfiles: response.data as ProfilesResponseType,
+							popularProfiles: responseData,
 						}));
 					}
 				} catch (err) {
@@ -133,9 +146,7 @@ export const ProfileDataProvider: FC<PropsWithChildren> = ({children}) => {
 			};
 
 			handleMount();
-		}, [
-            currentUser, 
-            authenticatedFetch]);
+		}, [currentUser, authenticatedFetch]);
 
 	return (
 		<ProfileDataContext.Provider value={profileData}>

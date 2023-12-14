@@ -70,9 +70,9 @@ export const AuthAxiosContext = createContext<
 export const AuthenticatedFetchContext = createContext<
 	(path: string) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
-export const AuthenticatedPostContext = createContext<
-	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
->(() => Promise.resolve({} as AxiosResponse));
+// export const AuthenticatedPostContext = createContext<
+// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
+// >(() => Promise.resolve({} as AxiosResponse));
 // export const AuthenticatedPutContext = createContext<
 // 	(path: string, body: object) => Promise<AxiosResponse<object> | null>
 // >(() => Promise.resolve({} as AxiosResponse));
@@ -173,42 +173,42 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 		[navigate]
 	);
 
-	const authenticatedPost = async (
-		path: string,
-		body: object
-	): Promise<AxiosResponse<PostResponseData> | null> => {
-		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey.current,
-			});
-			if (accessKeyData.status === 200) {
-				try {
-					const response = await axios.post(path, body, {
-						headers: {
-							Authorization: `Bearer ${accessKeyData.data.access}`,
-						},
-					});
-					return response;
-				} catch (err) {
-					console.error(err);
-					return null;
-				}
-			} else {
-				dispatch({ type: 'LOG_OUT' });
-				localStorage.removeItem('refresh');
-				console.log('refresh key has been cleared from everywhere!!');
-				navigate('signin');
-				return null;
-			}
-		} catch (err) {
-			dispatch({ type: 'LOG_OUT' });
-			localStorage.removeItem('refresh');
-			console.log('refresh key has been cleared from everywhere!!');
-			console.error(err);
-			navigate('signin');
-			return null;
-		}
-	};
+	// const authenticatedPost = async (
+	// 	path: string,
+	// 	body: object
+	// ): Promise<AxiosResponse<PostResponseData> | null> => {
+	// 	try {
+	// 		const accessKeyData = await axios.post('api/token/refresh/', {
+	// 			refresh: refreshKey.current,
+	// 		});
+	// 		if (accessKeyData.status === 200) {
+	// 			try {
+	// 				const response = await axios.post(path, body, {
+	// 					headers: {
+	// 						Authorization: `Bearer ${accessKeyData.data.access}`,
+	// 					},
+	// 				});
+	// 				return response;
+	// 			} catch (err) {
+	// 				console.error(err);
+	// 				return null;
+	// 			}
+	// 		} else {
+	// 			dispatch({ type: 'LOG_OUT' });
+	// 			localStorage.removeItem('refresh');
+	// 			console.log('refresh key has been cleared from everywhere!!');
+	// 			navigate('signin');
+	// 			return null;
+	// 		}
+	// 	} catch (err) {
+	// 		dispatch({ type: 'LOG_OUT' });
+	// 		localStorage.removeItem('refresh');
+	// 		console.log('refresh key has been cleared from everywhere!!');
+	// 		console.error(err);
+	// 		navigate('signin');
+	// 		return null;
+	// 	}
+	// };
 
 	const authAxios = useCallback(async ({method, path, body=null}: authAxiosPropsType): Promise<AxiosResponse<object> | null> => {
 		try {
@@ -442,7 +442,7 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 					<FetchTokensContext.Provider value={fetchAndSetTokens}>
 						<AuthAxiosContext.Provider value={authAxios}>
 						<AuthenticatedFetchContext.Provider value={authenticatedFetch}>
-							<AuthenticatedPostContext.Provider value={authenticatedPost}>
+							{/* <AuthenticatedPostContext.Provider value={authenticatedPost}> */}
 							{/* <AuthenticatedPutContext.Provider value={authenticatedPut}> */}
 								<AuthenticatedMultipartPostContext.Provider
 									value={authenticatedMultipartPost}>
@@ -457,7 +457,7 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 								</AuthenticatedMultipartPutContext.Provider>
 								</AuthenticatedMultipartPostContext.Provider>
 							{/* </AuthenticatedPutContext.Provider> */}
-							</AuthenticatedPostContext.Provider>
+							{/* </AuthenticatedPostContext.Provider> */}
 						</AuthenticatedFetchContext.Provider>
 						</AuthAxiosContext.Provider>
 					</FetchTokensContext.Provider>

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from './Post.module.css';
 import { Dispatch, SetStateAction, FC } from 'react';
-import { AuthAxiosContext, AuthenticatedPostContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { AuthAxiosContext, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
@@ -15,6 +15,10 @@ export type PostDetailProps = PostType & {
 	setPosts: Dispatch<SetStateAction<PostsResponseType>>;
 	postPage: boolean;
 };
+
+type LikeResponseType = {
+	id: number;
+}
 
 
 const PostDetail: FC<PostDetailProps> = ({
@@ -34,7 +38,6 @@ const PostDetail: FC<PostDetailProps> = ({
 }) => {
     
 	const currentUser = useContext(CurrentUserContext)
-	const authenticatedPost = useContext(AuthenticatedPostContext);
 	const authAxios = useContext(AuthAxiosContext);
 	const [isPostOwner, setIsPostOwner] = useState<boolean>(false);
 
@@ -69,12 +72,14 @@ const PostDetail: FC<PostDetailProps> = ({
 
 	const handleLike = async () => {
 		try {
-			const response = await authenticatedPost(
-				'/likes/',
-				{ post: id }
-			);
+			const response = await authAxios({
+				method: 'post',
+				path: '/likes/',
+				body: { post: id }
+		});
 			if (response && response.data && 'id' in response.data && typeof response.data.id === 'number') {
 				console.log('like response', response);
+				const responseData = response.data as LikeResponseType
 				setPosts((prevPosts: PostsResponseType) => {
 					const indx = prevPosts.results.findIndex((post) => post.id === id);
 					const updatedResults = [...prevPosts.results];
@@ -82,7 +87,7 @@ const PostDetail: FC<PostDetailProps> = ({
 					updatedResults[indx] = {
 						...updatedResults[indx],
 						likes_count: updatedResults[indx].likes_count + 1,
-						like_id: response.data.id,
+						like_id: responseData.id,
 					};
 					console.log('updated Post', updatedResults[indx]);
 					return {

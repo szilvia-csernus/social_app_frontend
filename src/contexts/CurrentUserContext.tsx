@@ -62,24 +62,6 @@ export const FetchTokensContext = createContext<
 export const AuthAxiosContext = createContext<
 (props: AuthAxiosPropsType) => Promise<AxiosResponse<object> | null>
 >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedFetchContext = createContext<
-// 	(path: string) => Promise<AxiosResponse<object> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedPostContext = createContext<
-// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedPutContext = createContext<
-// 	(path: string, body: object) => Promise<AxiosResponse<object> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedDeleteContext = createContext<
-// 	(path: string) => Promise<AxiosResponse<object> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedMultipartPostContext = createContext<
-// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
-// export const AuthenticatedMultipartPutContext = createContext<
-// 	(path: string, body: object) => Promise<AxiosResponse<PostResponseData> | null>
-// >(() => Promise.resolve({} as AxiosResponse));
 export const SetCurrentUserContext = createContext<React.Dispatch<Action>>(
 	() => {}
 );
@@ -131,80 +113,6 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 
 	const navigate = useNavigate();
 
-	// const authenticatedFetch = useCallback(
-	// 	async (path: string): Promise<AxiosResponse<object> | null> => {
-	// 		try {
-	// 			const accessKeyData = await axios.post('api/token/refresh/', {
-	// 				refresh: refreshKey.current,
-	// 			});
-	// 			if (accessKeyData.status === 200) {
-	// 				try {
-	// 					const response = await axios.get(path, {
-	// 						headers: {
-	// 							Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 						},
-	// 					});
-	// 					return response;
-	// 				} catch (err) {
-	// 					console.error(err);
-	// 					return null;
-	// 				}
-	// 			} else {
-	// 				dispatch({ type: 'LOG_OUT' });
-	// 				localStorage.removeItem('refresh');
-	// 				console.log('refresh key has been cleared from everywhere!!');
-	// 				navigate('signin');
-	// 				return null;
-	// 			}
-	// 		} catch (err) {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			console.error(err);
-	// 			// navigate('signin');
-	// 			return null;
-	// 		}
-	// 	},
-	// 	[navigate]
-	// );
-
-	// const authenticatedPost = async (
-	// 	path: string,
-	// 	body: object
-	// ): Promise<AxiosResponse<PostResponseData> | null> => {
-	// 	try {
-	// 		const accessKeyData = await axios.post('api/token/refresh/', {
-	// 			refresh: refreshKey.current,
-	// 		});
-	// 		if (accessKeyData.status === 200) {
-	// 			try {
-	// 				const response = await axios.post(path, body, {
-	// 					headers: {
-	// 						Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 					},
-	// 				});
-	// 				return response;
-	// 			} catch (err) {
-	// 				console.error(err);
-	// 				return null;
-	// 			}
-	// 		} else {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			navigate('signin');
-	// 			return null;
-	// 		}
-	// 	} catch (err) {
-	// 		dispatch({ type: 'LOG_OUT' });
-	// 		localStorage.removeItem('refresh');
-	// 		console.log('refresh key has been cleared from everywhere!!');
-	// 		console.error(err);
-	// 		navigate('signin');
-	// 		return null;
-	// 	}
-	// };
-
 	const authAxios = useCallback(async ({method, path, body=null, multipart=false}: AuthAxiosPropsType): Promise<AxiosResponse<object> | null> => {
 		try {
 			const accessKeyData = await axios.post('api/token/refresh/', {
@@ -251,143 +159,6 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 			return null;
 		}
 	},[navigate]);
-
-	// const authenticatedPut = async (
-	// 	path: string,
-	// 	body: object
-	// ): Promise<AxiosResponse<PostResponseData> | null> => {
-	// 	try {
-	// 		const accessKeyData = await axios.post('api/token/refresh/', {
-	// 			refresh: refreshKey.current,
-	// 		});
-	// 		if (accessKeyData.status === 200) {
-	// 			try {
-	// 				const response = await axios.put(path, body, {
-	// 					headers: {
-	// 						Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 					},
-	// 				});
-	// 				return response;
-	// 			} catch (err) {
-	// 				console.error(err);
-	// 				return null;
-	// 			}
-	// 		} else {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			navigate('signin');
-	// 			return null;
-	// 		}
-	// 	} catch (err) {
-	// 		dispatch({ type: 'LOG_OUT' });
-	// 		localStorage.removeItem('refresh');
-	// 		console.log('refresh key has been cleared from everywhere!!');
-	// 		console.error(err);
-	// 		navigate('signin');
-	// 		return null;
-	// 	}
-	// };
-
-	// const authenticatedDelete = async (
-	// 	path: string
-	// ): Promise<AxiosResponse<object> | null> => {
-	// 	try {
-	// 		const accessKeyData = await axios.post('api/token/refresh/', {
-	// 			refresh: refreshKey.current,
-	// 		});
-	// 		if (accessKeyData.status === 200) {
-	// 			try {
-	// 				const response = await axios.delete(path, {
-	// 					headers: {
-	// 						Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 					},
-	// 				});
-	// 				return response;
-	// 			} catch (err) {
-	// 				console.error(err);
-	// 				return null;
-	// 			}
-	// 		} else {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			navigate('signin');
-	// 			return null;
-	// 		}
-	// 	} catch (err) {
-	// 		dispatch({ type: 'LOG_OUT' });
-	// 		localStorage.removeItem('refresh');
-	// 		console.log('refresh key has been cleared from everywhere!!');
-	// 		console.error(err);
-	// 		navigate('signin');
-	// 		return null;
-	// 	}
-	// };
-
-	// const authenticatedMultipartPost = async (
-	// 	path: string,
-	// 	body: object
-	// ): Promise<AxiosResponse<PostResponseData> | null> => {
-	// 	try {
-	// 		const accessKeyData = await axios.post('api/token/refresh/', {
-	// 			refresh: refreshKey.current,
-	// 		});
-	// 		if (accessKeyData.status === 200) {
-	// 			return axios.post(path, body, {
-	// 				headers: {
-	// 					'Content-Type': 'multipart/form-data',
-	// 					Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 				},
-	// 			});
-	// 		} else {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			navigate('signin');
-	// 			return null;
-	// 		}
-	// 	} catch (err) {
-	// 		dispatch({ type: 'LOG_OUT' });
-	// 		localStorage.removeItem('refresh');
-	// 		console.log('refresh key has been cleared from everywhere!!');
-	// 		console.error(err);
-	// 		navigate('signin');
-	// 		return null;
-	// 	}
-	// };
-	
-	// const authenticatedMultipartPut = async (
-	// 	path: string,
-	// 	body: object
-	// ): Promise<AxiosResponse<PostResponseData> | null> => {
-	// 	try {
-	// 		const accessKeyData = await axios.post('api/token/refresh/', {
-	// 			refresh: refreshKey.current,
-	// 		});
-	// 		if (accessKeyData.status === 200) {
-	// 			return axios.put(path, body, {
-	// 				headers: {
-	// 					'Content-Type': 'multipart/form-data',
-	// 					Authorization: `Bearer ${accessKeyData.data.access}`,
-	// 				},
-	// 			});
-	// 		} else {
-	// 			dispatch({ type: 'LOG_OUT' });
-	// 			localStorage.removeItem('refresh');
-	// 			console.log('refresh key has been cleared from everywhere!!');
-	// 			navigate('signin');
-	// 			return null;
-	// 		}
-	// 	} catch (err) {
-	// 		dispatch({ type: 'LOG_OUT' });
-	// 		localStorage.removeItem('refresh');
-	// 		console.log('refresh key has been cleared from everywhere!!');
-	// 		console.error(err);
-	// 		navigate('signin');
-	// 		return null;
-	// 	}
-	// };
 
 	const fetchAndSetTokens = async (signinData: signinDataType) => {
 		const signinTokens = await axios.post('api/token/', signinData);
@@ -444,24 +215,9 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 				<RefreshKeyContext.Provider value={refreshKey}>
 					<FetchTokensContext.Provider value={fetchAndSetTokens}>
 						<AuthAxiosContext.Provider value={authAxios}>
-						{/* <AuthenticatedFetchContext.Provider value={authenticatedFetch}> */}
-							{/* <AuthenticatedPostContext.Provider value={authenticatedPost}> */}
-							{/* <AuthenticatedPutContext.Provider value={authenticatedPut}> */}
-								{/* <AuthenticatedMultipartPostContext.Provider
-									value={authenticatedMultipartPost}> */}
-								{/* <AuthenticatedMultipartPutContext.Provider
-									value={authenticatedMultipartPut}> */}
-									{/* <AuthenticatedDeleteContext.Provider
-										value={authenticatedDelete}> */}
-										<SetCurrentUserContext.Provider value={dispatch}>
-											{children}
-										</SetCurrentUserContext.Provider>
-									{/* </AuthenticatedDeleteContext.Provider> */}
-								{/* </AuthenticatedMultipartPutContext.Provider> */}
-								{/* </AuthenticatedMultipartPostContext.Provider> */}
-							{/* </AuthenticatedPutContext.Provider> */}
-							{/* </AuthenticatedPostContext.Provider> */}
-						{/* </AuthenticatedFetchContext.Provider> */}
+							<SetCurrentUserContext.Provider value={dispatch}>
+								{children}
+							</SetCurrentUserContext.Provider>
 						</AuthAxiosContext.Provider>
 					</FetchTokensContext.Provider>
 				</RefreshKeyContext.Provider>

@@ -4,10 +4,11 @@ import btnStyles from '../components/Button.module.css'
 import { Col, Row, Form, Button, Alert, Image, Container } from 'react-bootstrap';
 import illustration from '../assets/signup.jpg';
 
-import { type ChangeEvent, useState, FormEvent } from 'react';
+import { type ChangeEvent, useState, FormEvent, useContext, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 type SignUpDataType = {
 	username: string,
@@ -33,6 +34,7 @@ type ErrorResponse = {
 
 
 const SignUpForm = () => {
+	const currentUser = useContext(CurrentUserContext);
 	const [signUpData, setSignUpData] = useState<SignUpDataType>({
 		username: '',
 		password1: '',
@@ -77,6 +79,12 @@ const SignUpForm = () => {
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (currentUser) {
+			navigate('/');
+		}
+	}, [currentUser, navigate]);
 
 	return (
 		<Row className={styles.Row}>

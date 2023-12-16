@@ -4,11 +4,11 @@ import btnStyles from '../components/Button.module.css';
 import { Col, Row, Form, Button, Alert, Image, Container } from 'react-bootstrap';
 import illustration from '../assets/signin.jpg';
 
-import { type ChangeEvent, useState, FormEvent, useContext } from 'react';
+import { type ChangeEvent, useState, FormEvent, useContext, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { FetchTokensContext } from '../contexts/CurrentUserContext';
+import { CurrentUserContext, FetchTokensContext } from '../contexts/CurrentUserContext';
 
 export type signinDataType = {
 	username: string,
@@ -32,8 +32,7 @@ type ErrorResponse = {
 };
 
 const SignInForm = () => {
-	// const setUserWithRefreshKey = useContext(SetUserWithRefreshKeyContext)
-	// const refreshKey = useContext(RefreshKeyContext)
+	const currentUser = useContext(CurrentUserContext);
 	const fetchAndSetTokens = useContext(FetchTokensContext)
 
 	const [signinData, setSigninData] = useState<signinDataType>({
@@ -64,8 +63,6 @@ const SignInForm = () => {
 			const signinDataResponse = await axios.post('dj-rest-auth/login/', signinData)
 			if (signinDataResponse.status === 200) {
 				fetchAndSetTokens(signinData);
-				
-				navigate('/feed');
 			}
 		} catch (error) {
 			console.log(error);
@@ -82,6 +79,12 @@ const SignInForm = () => {
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (currentUser) {
+			navigate('/')
+		}
+	}, [currentUser, navigate])
 
 	return (
 		<Row className={styles.Row}>

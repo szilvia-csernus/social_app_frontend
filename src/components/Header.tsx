@@ -68,7 +68,7 @@ function Header() {
 				<i className="fas fa-sign-in-alt"></i>Sign in
 			</NavLink>
 			<NavLink to="/signup" className={styles.NavLink}>
-				<i className="fas fa-user-plus"></i>Sign Up
+				<i className="fas fa-user-plus"></i>Sign up
 			</NavLink>
 		</>
 	);

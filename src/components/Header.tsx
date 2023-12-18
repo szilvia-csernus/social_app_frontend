@@ -22,12 +22,10 @@ function Header() {
 	const { expanded, setExpanded, ref } = useClickOutsideToggle();
 
 	const HandleSignOut = async () => {
-		// this axios call may not be needed for logout if dj-rest-auth is not used for login.
 		const response = await axios.post('dj-rest-auth/logout/');
 		if (response.status === 200) {
 			dispatch({type: 'LOG_OUT'});
-			localStorage.removeItem('refresh');
-			console.log('refresh key has been cleared from everywhere!!')
+			localStorage.removeItem('access_exp');
 		} else {
 			console.log('Logout unsuccessful', response);
 		}

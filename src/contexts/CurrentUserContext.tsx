@@ -1,17 +1,16 @@
 import React, {
 	FC,
-	MutableRefObject,
 	PropsWithChildren,
 	createContext,
 	useCallback,
 	useMemo,
 	useReducer,
-	useRef,
 } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import ErrorBoundary from '../ErrorBoundary';
 import { useNavigate } from 'react-router';
 import { signinDataType } from '../auth/SignInForm';
+import { setTokenExp, shouldRefresh } from '../utils/utils';
 
 export type UserContextType = {
 	pk: number;
@@ -43,7 +42,7 @@ type Action =
 	| { type: 'EDIT_USERNAME'; payload: { username: string }}
 	| { type: 'UPDATE_PROFILE'; payload: { name: string, content: string, profile_image: string}}
 
-const initialRefreshKey = localStorage.getItem('refresh') || '';
+const accessTokenExpiry = localStorage.getItem('access_exp') || null;
 
 const initialCurrentUser: UserContextType = null;
 
@@ -108,48 +107,38 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 		currentUserReducer,
 		initialCurrentUser
 	);
-	const refreshKey = useRef<string>(initialRefreshKey);
-	const RefreshKeyContext = createContext<MutableRefObject<string>>(refreshKey);
 
 	const navigate = useNavigate();
 
 	const authAxios = useCallback(async ({method, path, body=null, multipart=false}: AuthAxiosPropsType): Promise<AxiosResponse<object> | null> => {
 		try {
-			const accessKeyData = await axios.post('api/token/refresh/', {
-				refresh: refreshKey.current,
-			});
-			if (accessKeyData.status === 200) {
-				const config: {
-					headers: {
-						Authorization: string;
-						'Content-Type'?: string;
-					}
-				} = {
-					headers: {
-						Authorization: `Bearer ${accessKeyData.data.access}`,
-					},
-				};
-				if (multipart) {
-					config.headers['Content-Type'] = 'multipart/form-data'
-				}
-				switch (method) {
-					case 'post':
-						return axios.post(path, body, config);
-					case 'put':
-						return axios.put(path, body, config);
-					case 'delete':
-						return axios.delete(path, config);
-					default:
-						return axios.get(path, config);
-				}
-				
-			} else {
-				dispatch({ type: 'LOG_OUT' });
-				localStorage.removeItem('refresh');
-				console.log('refresh key has been cleared from everywhere!!');
-				navigate('signin');
-				return null;
+			if (shouldRefresh()) {
+				const accessKeyData = await axios.post('dj-rest-auth/token/refresh/');
+				setTokenExp(accessKeyData.data.access);
 			}
+			const config: {
+				headers: {
+					'Content-Type'?: string;
+				}
+			} = {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			};
+			if (multipart) {
+				config.headers['Content-Type'] = 'multipart/form-data'
+			}
+			switch (method) {
+				case 'post':
+					return axios.post(path, body, config);
+				case 'put':
+					return axios.put(path, body, config);
+				case 'delete':
+					return axios.delete(path, config);
+				default:
+					return axios.get(path, config);
+			}
+				
 		} catch (err) {
 			dispatch({ type: 'LOG_OUT' });
 			localStorage.removeItem('refresh');
@@ -159,16 +148,6 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 			return null;
 		}
 	},[navigate]);
-
-	const fetchAndSetTokens = async (signinData: signinDataType) => {
-		const signinTokens = await axios.post('api/token/', signinData);
-		console.log('refreshKey before setting: ', refreshKey);
-		refreshKey.current = signinTokens.data.refresh;
-		console.log('refreshKey after setting: ', refreshKey.current);
-		setUserWithRefreshKey();
-		localStorage.setItem('refresh', signinTokens.data.refresh);
-		console.log('refresh token set in localstorage', signinTokens.data.refresh);
-	};
 
 	const fetchUser = useCallback(async () => {
 		try {
@@ -190,8 +169,8 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 		}
 	}, [authAxios]);
 
-	const setUserWithRefreshKey = useCallback(() => {
-		console.log('setting user with refresh key function runs');
+	const setUser = useCallback(() => {
+		console.log('setting user for the first time');
 		fetchUser().then((user) => {
 			if (user) {
 				console.log('newUser: ', user);
@@ -204,23 +183,24 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	}, [fetchUser]);
 
 	useMemo(() => {
-		if (refreshKey) {
-			setUserWithRefreshKey();
+		if (!accessTokenExpiry) return null;
+
+		const expDate = new Date(accessTokenExpiry);
+		if (expDate.getTime() >= Date.now()) {
+			return setUser();
+		} else {
+			return null;
 		}
-	}, [setUserWithRefreshKey]);
+	}, [setUser]);
 
 	return (
 		<ErrorBoundary>
 			<CurrentUserContext.Provider value={currentUser}>
-				<RefreshKeyContext.Provider value={refreshKey}>
-					<FetchTokensContext.Provider value={fetchAndSetTokens}>
-						<AuthAxiosContext.Provider value={authAxios}>
-							<SetCurrentUserContext.Provider value={dispatch}>
-								{children}
-							</SetCurrentUserContext.Provider>
-						</AuthAxiosContext.Provider>
-					</FetchTokensContext.Provider>
-				</RefreshKeyContext.Provider>
+				<AuthAxiosContext.Provider value={authAxios}>
+					<SetCurrentUserContext.Provider value={dispatch}>
+						{children}
+					</SetCurrentUserContext.Provider>
+				</AuthAxiosContext.Provider>
 			</CurrentUserContext.Provider>
 		</ErrorBoundary>
 	);

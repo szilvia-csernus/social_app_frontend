@@ -8,7 +8,8 @@ import { type ChangeEvent, useState, FormEvent, useContext, useEffect } from 're
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { CurrentUserContext, FetchTokensContext } from '../contexts/CurrentUserContext';
+import { CurrentUserContext, SetCurrentUserContext } from '../contexts/CurrentUserContext';
+import { setTokenExp } from '../utils/utils';
 
 export type signinDataType = {
 	username: string,
@@ -33,7 +34,7 @@ type ErrorResponse = {
 
 const SignInForm = () => {
 	const currentUser = useContext(CurrentUserContext);
-	const fetchAndSetTokens = useContext(FetchTokensContext)
+	const dispatch = useContext(SetCurrentUserContext);
 
 	const [signinData, setSigninData] = useState<signinDataType>({
 		username: '',
@@ -62,7 +63,11 @@ const SignInForm = () => {
 		try {
 			const signinDataResponse = await axios.post('dj-rest-auth/login/', signinData)
 			if (signinDataResponse.status === 200) {
-				fetchAndSetTokens(signinData);
+				dispatch({
+					type: 'LOG_IN',
+					payload: { user: signinDataResponse.data.user },
+				});
+				setTokenExp(signinDataResponse.data.access);
 			}
 		} catch (error) {
 			console.log(error);

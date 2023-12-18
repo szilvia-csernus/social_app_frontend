@@ -4,6 +4,7 @@ import { PostType, PostsResponseType } from "../pages/posts/PostTypes";
 import { CommentType, CommentsResponseType } from "../pages/comments/CommentTypes";
 import { ProfileType } from "../pages/profiles/ProfileTypes";
 import { AuthAxiosPropsType } from "../contexts/CurrentUserContext";
+import { jwtDecode } from "jwt-decode";
 
 export type ResourceType = 
 	| PostsResponseType | CommentsResponseType;
@@ -87,3 +88,20 @@ export const unfollowHelper = (
 			: profile?.following_count,
 	};
 };
+
+export const setTokenExp = (access: string) => {
+	const accessExp = jwtDecode(access).exp;
+	accessExp && localStorage.setItem('access_exp', accessExp.toString());
+}
+
+export const shouldRefresh = () => {
+	const exp = localStorage.getItem('access_exp');
+	if (!exp) return false;
+
+	const expDate = new Date(exp);
+	if (expDate.getTime() <= Date.now()) {
+		return false
+	} else {
+		return true
+	}
+}

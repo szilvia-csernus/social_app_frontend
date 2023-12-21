@@ -1,4 +1,11 @@
-import { useState, useEffect, useRef, ChangeEvent, FormEvent, useContext } from 'react';
+import {
+	useState,
+	useEffect,
+	useRef,
+	ChangeEvent,
+	FormEvent,
+	useContext,
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import Form from 'react-bootstrap/Form';
@@ -10,9 +17,9 @@ import Container from 'react-bootstrap/Container';
 import Alert from 'react-bootstrap/Alert';
 
 import {
-    AuthAxiosContext,
-    CurrentUserContext,
-    SetCurrentUserContext
+	AuthAxiosContext,
+	CurrentUserContext,
+	SetCurrentUserContext,
 } from '../../contexts/CurrentUserContext';
 
 import btnStyles from '../../components/Button.module.css';
@@ -25,7 +32,7 @@ const ProfileEditForm = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const imageFile = useRef<HTMLInputElement>(null);
-    const authAxios = useContext(AuthAxiosContext);
+	const authAxios = useContext(AuthAxiosContext);
 
 	const [profileData, setProfileData] = useState<EditProfileDataType>({
 		name: '',
@@ -40,13 +47,13 @@ const ProfileEditForm = () => {
 		const handleMount = async () => {
 			if (currentUser?.profile_id?.toString() === id) {
 				try {
-					const response = await authAxios({path: `/profiles/${id}/`});
-                    if (response && response.data) {
-                        const { name, content, image } = response.data as EditProfileDataType;
-                        setProfileData({ name, content, image });
-                    }
+					const response = await authAxios({ path: `/profiles/${id}/` });
+					if (response && response.data) {
+						const { name, content, image } =
+							response.data as EditProfileDataType;
+						setProfileData({ name, content, image });
+					}
 				} catch (err) {
-					console.log(err);
 					navigate('/');
 				}
 			} else {
@@ -64,33 +71,48 @@ const ProfileEditForm = () => {
 		});
 	};
 
+	const handleChangeImage = (event: ChangeEvent<HTMLInputElement>) => {
+		if (event.target.files && event.target.files.length) {
+			URL.revokeObjectURL(image);
+			setProfileData({
+				...profileData,
+				image: URL.createObjectURL(event.target.files[0]),
+			});
+		}
+	};
+
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault();
 		const formData = new FormData();
 		formData.append('name', name);
 		formData.append('content', content);
 
-        if (
-            imageFile.current &&
-            imageFile.current.files &&
-            imageFile.current.files.length > 0
-        ) {
-            formData.append('image', imageFile.current.files[0]);
-        }
+		if (
+			imageFile.current &&
+			imageFile.current.files &&
+			imageFile.current.files.length > 0
+		) {
+			formData.append('image', imageFile.current.files[0]);
+		}
 
 		try {
-			const response = await authAxios({ method: 'put', path: `/profiles/${id}/`, body: formData});
+			const response = await authAxios({
+				method: 'put',
+				path: `/profiles/${id}/`,
+				body: formData,
+				multipart: true,
+			});
 			if (response && response.data) {
-                const responseData = response.data as EditProfileDataType
-                dispatch({
-                            type: 'UPDATE_PROFILE',
-                            payload: {
-                                name: responseData.name,
-                                content: responseData.content,
-                                profile_image: responseData.image,
-                            },
-                        });
-            }
+				const responseData = response.data as EditProfileDataType;
+				dispatch({
+					type: 'UPDATE_PROFILE',
+					payload: {
+						name: responseData.name,
+						content: responseData.content,
+						profile_image: responseData.image,
+					},
+				});
+			}
 			navigate(-1);
 		} catch (err) {
 			const axiosError = err as AxiosError;
@@ -165,16 +187,8 @@ const ProfileEditForm = () => {
 								id="image-upload"
 								ref={imageFile}
 								accept="image/*"
-                                className="mt-2"
-								onChange={(e) => {
-                                    const files = (e.target as HTMLInputElement).files;
-                                    if (files && files.length > 0) {
-                                        setProfileData({
-                                            ...profileData,
-                                            image: URL.createObjectURL(files[0]),
-                                        });
-                                    }
-								}}
+								className="mt-2"
+								onChange={handleChangeImage}
 							/>
 						</Form.Group>
 						<div className="d-md-none">{textFields}</div>

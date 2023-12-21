@@ -113,7 +113,7 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 	const authAxios = useCallback(async ({method, path, body=null, multipart=false}: AuthAxiosPropsType): Promise<AxiosResponse<object> | null> => {
 		try {
 			if (shouldRefresh()) {
-				const accessKeyData = await axios.post('dj-rest-auth/token/refresh/');
+				const accessKeyData = await axios.post('/dj-rest-auth/token/refresh/');
 				setTokenExp(accessKeyData.data.access);
 			}
 			const config: {
@@ -141,8 +141,6 @@ export const CurrentUserProvider: FC<PropsWithChildren> = ({
 				
 		} catch (err) {
 			dispatch({ type: 'LOG_OUT' });
-			localStorage.removeItem('refresh');
-			console.log('refresh key has been cleared from everywhere!!');
 			console.error(err);
 			navigate('signin');
 			return null;
